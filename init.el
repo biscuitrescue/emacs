@@ -141,6 +141,7 @@
       :prefix "SPC"
       :global-prefix "C-SPC")
     (rune/leader-keys
+      "." '(dired :which-key "Dired")
       "f" '(:ignore f :which-key "File")
       "fs" '(save-buffer :which-key "Write")
       "w" '(:ignore w :which-key "Window")
@@ -153,10 +154,11 @@
       "ws" '(split-window-below :which "Split Vertical")
       "t" '(:ignore t :which-key "toggles")
       "tt" '(counsel-load-theme :which-key "choose theme")
-      "tx" '(toggle-truncate-lines :which-key "toggle truncate"))
+      "tx" '(toggle-truncate-lines :which-key "toggle truncate")))
 
 (use-package evil
   :init
+  (evil-mode 1)
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
   (setq evil-want-C-u-scroll t)
@@ -166,7 +168,6 @@
 
   ;; Activate the Evil
   :config
-  (evil-mode 1)
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
