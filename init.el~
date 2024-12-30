@@ -27,7 +27,6 @@
 (dolist (mode '(org-mode-hook
 		term-mode-hook
 		shell-mode-hook
-		vterm-mode-hook
 		eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
@@ -145,8 +144,6 @@
       :prefix "SPC"
       :global-prefix "C-SPC")
     (rune/leader-keys
-      "o" '(:ignore o :which-key "open")
-      "ot" '(vterm-toggle :which-key "Toggle Vterm")
       "SPC" '(neotree-toggle :which-key "Neotree")
       "." '(counsel-find-file :which-key "Dired")
       "f" '(:ignore f :which-key "File")
