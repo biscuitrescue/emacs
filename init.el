@@ -11,7 +11,7 @@
 
 (set-face-attribute 'default nil :font "Zed Mono" :height 85)
 ;;(load-theme 'catppuccin :no-confirm)
-(load-theme 'catppuccin :no-confirm)
+(load-theme 'doom-palenight :no-confirm)
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -81,7 +81,7 @@
  '(highlight-indent-guides-auto-enabled nil)
  '(highlight-indent-guides-method 'character)
  '(package-selected-packages
-   '(vterm-toggle vterm neotree highlight-indent-guides lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
+   '(evil-collection vterm-toggle vterm neotree highlight-indent-guides lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -92,7 +92,7 @@
 (use-package doom-modeline
   :ensure t
   :init (doom-modeline-mode 1)
-  :custom ((doom-modeline-height 20)))
+  :custom ((doom-modeline-height 40)))
 
 (setq doom-modeline-icon t)
 (setq doom-modeline-major-mode-icon t)
@@ -147,6 +147,7 @@
       :global-prefix "C-SPC")
     (rune/leader-keys
       "o" '(:ignore o :which-key "open")
+      "ot" '(vterm-toggle :which-key "toggle Vterm")
       "SPC" '(neotree-toggle :which-key "Neotree")
       "." '(counsel-find-file :which-key "Dired")
       "f" '(:ignore f :which-key "File")
@@ -332,6 +333,20 @@
   (add-hook 'prog-mode-hook 'yas-minor-mode)
   (add-hook 'text-mode-hook 'yas-minor-mode))
 
-;; (set-face-background 'highlight-indent-guides-odd-face "dimgray")
-;; (set-face-background 'highlight-indent-guides-even-face "dimgray")
-;; (set-face-foreground 'highlight-indent-guides-character-face "dimgray")
+(add-hook 'highlight-indent-guides-mode-hook
+	  (lambda()
+	    (set-face-background 'highlight-indent-guides-odd-face "dimgray")
+	    (set-face-background 'highlight-indent-guides-even-face "dimgray")
+	    (set-face-foreground 'highlight-indent-guides-character-face "dimgray")	    
+	  )
+	    
+)
+
+(use-package dired
+  :ensure nil
+  :commands (dired dired-jump)
+  :bind (("C-x C-j" . dired-jump))
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+			      "h" 'dired-up-directory
+			      "l" 'dired-find-file))

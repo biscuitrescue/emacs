@@ -11,7 +11,7 @@
 
 (set-face-attribute 'default nil :font "Zed Mono" :height 85)
 ;;(load-theme 'catppuccin :no-confirm)
-(load-theme 'catppuccin :no-confirm)
+(load-theme 'doom-palenight :no-confirm)
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -27,6 +27,7 @@
 (dolist (mode '(org-mode-hook
 		term-mode-hook
 		shell-mode-hook
+		vterm-mode-hook
 		eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
@@ -80,7 +81,7 @@
  '(highlight-indent-guides-auto-enabled nil)
  '(highlight-indent-guides-method 'character)
  '(package-selected-packages
-   '(vterm-toggle vterm neotree highlight-indent-guides lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
+   '(evil-collection vterm-toggle vterm neotree highlight-indent-guides lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -117,8 +118,9 @@
 (use-package counsel
   :init
   (counsel-mode 1)
-  :bind (("M-x" . counsel-M-x)
+  :bind (;("M-x" . counsel-M-x)
 	 ("C-x b" . counsel-ibuffer)
+	 ("C-x s" . counsel-switch-buffer)
 	 ("C-x C-f" . counsel-find-file)
 	 :map minibuffer-local-map
 	 ("C-r" . counsel-minibuffer-history))
@@ -144,6 +146,7 @@
       :prefix "SPC"
       :global-prefix "C-SPC")
     (rune/leader-keys
+      "o" '(:ignore o :which-key "open")
       "SPC" '(neotree-toggle :which-key "Neotree")
       "." '(counsel-find-file :which-key "Dired")
       "f" '(:ignore f :which-key "File")
@@ -230,6 +233,8 @@
 (define-key global-map [remap find-file] #'helm-find-files)
 (define-key global-map [remap execute-extended-command] #'helm-M-x)
 (define-key global-map [remap switch-to-buffer] #'helm-mini)
+(define-key global-map [remap switch-to-buffer] #'helm-mini)
+(global-set-key (kbd "M-x") 'helm-M-x)
 
 (which-key-mode)
 (add-hook 'c-mode-hook 'lsp)
@@ -327,6 +332,20 @@
   (add-hook 'prog-mode-hook 'yas-minor-mode)
   (add-hook 'text-mode-hook 'yas-minor-mode))
 
-;; (set-face-background 'highlight-indent-guides-odd-face "dimgray")
-;; (set-face-background 'highlight-indent-guides-even-face "dimgray")
-;; (set-face-foreground 'highlight-indent-guides-character-face "dimgray")
+(add-hook 'highlight-indent-guides-mode-hook
+	  (lambda()
+	    (set-face-background 'highlight-indent-guides-odd-face "dimgray")
+	    (set-face-background 'highlight-indent-guides-even-face "dimgray")
+	    (set-face-foreground 'highlight-indent-guides-character-face "dimgray")	    
+	  )
+	    
+)
+
+(use-package dired
+  :ensure nil
+  :commands (dired dired-jump)
+  :bind (("C-x C-j" . dired-jump))
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+			      "h" 'dired-up-directory
+			      "l" 'dired-find-file))
