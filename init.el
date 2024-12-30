@@ -141,8 +141,19 @@
       :prefix "SPC"
       :global-prefix "C-SPC")
     (rune/leader-keys
+      "f" '(:ignore f :which-key "File")
+      "fs" '(save-buffer :which-key "Write")
+      "w" '(:ignore w :which-key "Window")
+      "wj" '(evil-window-down :which "To next window")
+      "wk" '(evil-window-up :which "To prev window")
+      "wh" '(evil-window-left :which "To left window")
+      "wl" '(evil-window-right :which "To right window")
+      "wq" '(delete-window :which "Quit Window")
+      "wv" '(split-window-right :which "Split Horizontal")
+      "ws" '(split-window-below :which "Split Vertical")
       "t" '(:ignore t :which-key "toggles")
-      "tt" '(counsel-load-theme :which-key "choose theme")))
+      "tt" '(counsel-load-theme :which-key "choose theme")
+      "tx" '(toggle-truncate-lines :which-key "toggle truncate"))
 
 (use-package evil
   :init
@@ -177,8 +188,8 @@
   (setq undo-tree-enable-undo-in-region nil)
   (setq undo-tree-history-directory-alist '(("." . "~/emacs.d/undo")))
  (add-hook 'undo-tree-visualizer-mode-hook (lambda ()
-                                              (undo-tree-visualizer-selection-mode)
-                                              (setq display-line-numbers nil)))
+					     (undo-tree-visualizer-selection-mode)
+					     (setq display-line-numbers nil)))
   :config
   (global-undo-tree-mode 1))
 
