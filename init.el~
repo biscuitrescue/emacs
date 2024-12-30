@@ -11,7 +11,7 @@
 
 (set-face-attribute 'default nil :font "Zed Mono" :height 85)
 ;;(load-theme 'catppuccin :no-confirm)
-(load-theme 'doom-palenight :no-confirm)
+(load-theme 'doom-dracula :no-confirm)
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -77,7 +77,7 @@
  '(custom-safe-themes
    '("5f128efd37c6a87cd4ad8e8b7f2afaba425425524a68133ac0efd87291d05874" "0a2168af143fb09b67e4ea2a7cef857e8a7dad0ba3726b500c6a579775129635" "88f7ee5594021c60a4a6a1c275614103de8c1435d6d08cc58882f920e0cec65e" "8c7e832be864674c220f9a9361c851917a93f921fedb7717b1b5ece47690c098" default))
  '(package-selected-packages
-   '(undo-tree evil general doom-themes helpful counsel all-the-icons-dired all-the-icons-completion all-the-icons-ivy-rich all-the-icons-nerd-fonts all-the-icons-ivy all-the-icons catppuccin-theme which-key rainbow-delimiters doom-modeline swiper ivy command-log-mode)))
+   '(rust-mode toml-mode ccls lsp-ui lsp-mode undo-tree evil general doom-themes helpful counsel all-the-icons-dired all-the-icons-completion all-the-icons-ivy-rich all-the-icons-nerd-fonts all-the-icons-ivy all-the-icons catppuccin-theme which-key rainbow-delimiters doom-modeline swiper ivy command-log-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -141,7 +141,7 @@
       :prefix "SPC"
       :global-prefix "C-SPC")
     (rune/leader-keys
-      "." '(dired :which-key "Dired")
+      "." '(counsel-find-file :which-key "Dired")
       "f" '(:ignore f :which-key "File")
       "fs" '(save-buffer :which-key "Write")
       "w" '(:ignore w :which-key "Window")
@@ -172,6 +172,9 @@
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
 
+  (evil-global-set-key 'normal "u" 'undo)
+  (evil-global-set-key 'normal "gcc" 'comment-line)
+  (evil-global-set-key 'visual "gc" 'comment-line)
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
   (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
 
@@ -198,9 +201,106 @@
 
 ;; LSP MODE
 
-(use-package lsp-mode
-  :commands (lsp lsp-deferred)
-  :init
-  (setq lsp-keymap-prefix "C-c l")
+;; (use-package lsp-mode
+;;   :commands (lsp lsp-deferred)
+;;   :init
+;;   (setq lsp-auto-guess-root nil)
+;;   :hook
+;;   (rust-mode . lsp)
+;;   (lsp-mode . lsp-enable-which-key-integration)
+;;   :commands lsp)
+
+;; (use-package lsp-ui
+;;   :commands lsp-ui-mode)
+
+(setq package-selected-packages '(lsp-mode yasnippet lsp-treemacs helm-lsp
+    projectile hydra flycheck company avy which-key helm-xref dap-mode))
+
+(when (cl-find-if-not #'package-installed-p package-selected-packages)
+  (package-refresh-contents)
+  (mapc #'package-install package-selected-packages))
+
+;; sample `helm' configuration use https://github.com/emacs-helm/helm/ for details
+(helm-mode)
+(require 'helm-xref)
+(define-key global-map [remap find-file] #'helm-find-files)
+(define-key global-map [remap execute-extended-command] #'helm-M-x)
+(define-key global-map [remap switch-to-buffer] #'helm-mini)
+
+(which-key-mode)
+(add-hook 'c-mode-hook 'lsp)
+(add-hook 'c++-mode-hook 'lsp)
+
+(setq gc-cons-threshold (* 100 1024 1024)
+      read-process-output-max (* 1024 1024)
+      treemacs-space-between-root-nodes nil
+      company-idle-delay 0.0
+      company-minimum-prefix-length 1
+      lsp-idle-delay 0.1)  ;; clangd is fast
+
+(with-eval-after-load 'lsp-mode
+  (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration)
+  (require 'dap-cpptools)
+  (yas-global-mode))
+
+
+;; RUST
+
+(use-package rustic
+  :ensure
+  :bind (:map rustic-mode-map
+              ("M-j" . lsp-ui-imenu)
+              ("M-?" . lsp-find-references)
+              ("C-c C-c l" . flycheck-list-errors)
+              ("C-c C-c a" . lsp-execute-code-action)
+              ("C-c C-c r" . lsp-rename)
+              ("C-c C-c q" . lsp-workspace-restart)
+              ("C-c C-c Q" . lsp-workspace-shutdown)
+              ("C-c C-c s" . lsp-rust-analyzer-status))
   :config
-  (lsp-enable-which-key-integration t))
+  ;; uncomment for less flashiness
+  ;; (setq lsp-eldoc-hook nil)
+  ;; (setq lsp-enable-symbol-highlighting nil)
+  ;; (setq lsp-signature-auto-activate nil)
+
+  ;; comment to disable rustfmt on save
+  (setq rustic-format-on-save t)
+  (add-hook 'rustic-mode-hook 'rk/rustic-mode-hook))
+
+(defun rk/rustic-mode-hook ()
+  ;; so that run C-c C-c C-r works without having to confirm, but don't try to
+  ;; save rust buffers that are not file visiting. Once
+  ;; https://github.com/brotzeit/rustic/issues/253 has been resolved this should
+  ;; no longer be necessary.
+  (when buffer-file-name
+    (setq-local buffer-save-without-query t))
+  (add-hook 'before-save-hook 'lsp-format-buffer nil t))
+
+
+(use-package lsp-mode
+  :ensure
+  :commands lsp
+  :custom
+  ;; what to use when checking on-save. "check" is default, I prefer clippy
+  (lsp-rust-analyzer-cargo-watch-command "clippy")
+  (lsp-eldoc-render-all t)
+  (lsp-idle-delay 0.6)
+  ;; enable / disable the hints as you prefer:
+  (lsp-inlay-hint-enable t)
+  ;; These are optional configurations. See https://emacs-lsp.github.io/lsp-mode/page/lsp-rust-analyzer/#lsp-rust-analyzer-display-chaining-hints for a full list
+  (lsp-rust-analyzer-display-lifetime-elision-hints-enable "skip_trivial")
+  (lsp-rust-analyzer-display-chaining-hints t)
+  (lsp-rust-analyzer-display-lifetime-elision-hints-use-parameter-names nil)
+  (lsp-rust-analyzer-display-closure-return-type-hints t)
+  (lsp-rust-analyzer-display-parameter-hints nil)
+  (lsp-rust-analyzer-display-reborrow-hints nil)
+  :config
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+
+(use-package lsp-ui
+  :ensure
+  :commands lsp-ui-mode
+  :custom
+  (lsp-ui-peek-always-show t)
+  (lsp-ui-sideline-show-hover t)
+  (lsp-ui-doc-enable nil))
