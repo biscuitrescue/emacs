@@ -9,9 +9,9 @@
 
 (setq visible-bell t)
 
-(set-face-attribute 'default nil :font "Zed Mono" :height 85)
+(set-face-attribute 'default nil :font "Fira Code" :height 85)
 ;;(load-theme 'catppuccin :no-confirm)
-(load-theme 'doom-palenight :no-confirm)
+(load-theme 'doom-dracula :no-confirm)
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -166,13 +166,13 @@
 
 (use-package evil
   :init
-  (evil-mode 1)
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
   (setq evil-want-C-u-scroll t)
   (setq evil-want-C-i-jump nil)
   (setq evil-respect-visual-line-mode t)
   (setq evil-undo-system 'undo-tree)
+  (evil-mode 1)
 
   ;; Activate the Evil
   :config
@@ -188,6 +188,13 @@
 
   (evil-set-initial-state 'messages-buffer-mode 'normal)
   (evil-set-initial-state 'dashboard-mode 'normal))
+
+
+(use-package evil-collection
+  :after evil
+  :ensure t
+  :config
+  (evil-collection-init))
 
 (use-package undo-tree
   :ensure t
