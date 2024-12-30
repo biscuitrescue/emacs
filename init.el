@@ -118,8 +118,9 @@
 (use-package counsel
   :init
   (counsel-mode 1)
-  :bind (("M-x" . counsel-M-x)
+  :bind (;("M-x" . counsel-M-x)
 	 ("C-x b" . counsel-ibuffer)
+	 ("C-x s" . counsel-switch-buffer)
 	 ("C-x C-f" . counsel-find-file)
 	 :map minibuffer-local-map
 	 ("C-r" . counsel-minibuffer-history))
@@ -146,7 +147,6 @@
       :global-prefix "C-SPC")
     (rune/leader-keys
       "o" '(:ignore o :which-key "open")
-      "ot" '(vterm-toggle :which-key "Toggle Vterm")
       "SPC" '(neotree-toggle :which-key "Neotree")
       "." '(counsel-find-file :which-key "Dired")
       "f" '(:ignore f :which-key "File")
@@ -233,6 +233,8 @@
 (define-key global-map [remap find-file] #'helm-find-files)
 (define-key global-map [remap execute-extended-command] #'helm-M-x)
 (define-key global-map [remap switch-to-buffer] #'helm-mini)
+(define-key global-map [remap switch-to-buffer] #'helm-mini)
+(global-set-key (kbd "M-x") 'helm-M-x)
 
 (which-key-mode)
 (add-hook 'c-mode-hook 'lsp)
