@@ -11,7 +11,7 @@
 
 (set-face-attribute 'default nil :font "Zed Mono" :height 85)
 ;;(load-theme 'catppuccin :no-confirm)
-(load-theme 'doom-dracula :no-confirm)
+(load-theme 'catppuccin :no-confirm)
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -22,12 +22,12 @@
 (global-display-line-numbers-mode t)
 (setq display-line-numbers-type 'relative)
 (electric-pair-mode 1)
-;;(setq display-line-numbers 'relative)
+(add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
 
 (dolist (mode '(org-mode-hook
 		term-mode-hook
 		shell-mode-hook
-	       eshell-mode-hook))
+		eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (require 'package)
@@ -77,8 +77,10 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    '("5f128efd37c6a87cd4ad8e8b7f2afaba425425524a68133ac0efd87291d05874" "0a2168af143fb09b67e4ea2a7cef857e8a7dad0ba3726b500c6a579775129635" "88f7ee5594021c60a4a6a1c275614103de8c1435d6d08cc58882f920e0cec65e" "8c7e832be864674c220f9a9361c851917a93f921fedb7717b1b5ece47690c098" default))
+ '(highlight-indent-guides-auto-enabled nil)
+ '(highlight-indent-guides-method 'character)
  '(package-selected-packages
-   '(rustic lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
+   '(neotree highlight-indent-guides lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -142,6 +144,7 @@
       :prefix "SPC"
       :global-prefix "C-SPC")
     (rune/leader-keys
+      "SPC" '(neotree-toggle :which-key "Neotree")
       "." '(counsel-find-file :which-key "Dired")
       "f" '(:ignore f :which-key "File")
       "fs" '(save-buffer :which-key "Write")
@@ -323,3 +326,7 @@
   (yas-reload-all)
   (add-hook 'prog-mode-hook 'yas-minor-mode)
   (add-hook 'text-mode-hook 'yas-minor-mode))
+
+;; (set-face-background 'highlight-indent-guides-odd-face "dimgray")
+;; (set-face-background 'highlight-indent-guides-even-face "dimgray")
+;; (set-face-foreground 'highlight-indent-guides-character-face "dimgray")
