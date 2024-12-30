@@ -77,7 +77,7 @@
  '(custom-safe-themes
    '("5f128efd37c6a87cd4ad8e8b7f2afaba425425524a68133ac0efd87291d05874" "0a2168af143fb09b67e4ea2a7cef857e8a7dad0ba3726b500c6a579775129635" "88f7ee5594021c60a4a6a1c275614103de8c1435d6d08cc58882f920e0cec65e" "8c7e832be864674c220f9a9361c851917a93f921fedb7717b1b5ece47690c098" default))
  '(package-selected-packages
-   '(lsp-mode undo-tree evil general doom-themes helpful counsel all-the-icons-dired all-the-icons-completion all-the-icons-ivy-rich all-the-icons-nerd-fonts all-the-icons-ivy all-the-icons catppuccin-theme which-key rainbow-delimiters doom-modeline swiper ivy command-log-mode)))
+   '(undo-tree evil general doom-themes helpful counsel all-the-icons-dired all-the-icons-completion all-the-icons-ivy-rich all-the-icons-nerd-fonts all-the-icons-ivy all-the-icons catppuccin-theme which-key rainbow-delimiters doom-modeline swiper ivy command-log-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
