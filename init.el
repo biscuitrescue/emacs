@@ -11,7 +11,7 @@
 
 (set-face-attribute 'default nil :font "Fira Code" :height 85)
 ;;(load-theme 'catppuccin :no-confirm)
-(load-theme 'doom-dracula :no-confirm)
+(load-theme 'mocha :no-confirm)
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -77,11 +77,12 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("5f128efd37c6a87cd4ad8e8b7f2afaba425425524a68133ac0efd87291d05874" "0a2168af143fb09b67e4ea2a7cef857e8a7dad0ba3726b500c6a579775129635" "88f7ee5594021c60a4a6a1c275614103de8c1435d6d08cc58882f920e0cec65e" "8c7e832be864674c220f9a9361c851917a93f921fedb7717b1b5ece47690c098" default))
+   '("c34ff622d6aa8f81fa9f286ed0089bd09b239d0c3c36d5a2410ccdad9f58b6d2" "5f128efd37c6a87cd4ad8e8b7f2afaba425425524a68133ac0efd87291d05874" "0a2168af143fb09b67e4ea2a7cef857e8a7dad0ba3726b500c6a579775129635" "88f7ee5594021c60a4a6a1c275614103de8c1435d6d08cc58882f920e0cec65e" "8c7e832be864674c220f9a9361c851917a93f921fedb7717b1b5ece47690c098" default))
+ '(helm-minibuffer-history-key "M-p")
  '(highlight-indent-guides-auto-enabled nil)
  '(highlight-indent-guides-method 'character)
  '(package-selected-packages
-   '(evil-collection vterm-toggle vterm neotree highlight-indent-guides lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
+   '(dashboard evil-collection vterm-toggle vterm neotree highlight-indent-guides lsp-mode yasnippet lsp-treemacs helm-lsp projectile hydra flycheck company avy which-key helm-xref dap-mode)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -118,7 +119,7 @@
 (use-package counsel
   :init
   (counsel-mode 1)
-  :bind (;("M-x" . counsel-M-x)
+  :bind (("M-x" . counsel-M-x)
 	 ("C-x b" . counsel-ibuffer)
 	 ("C-x s" . counsel-switch-buffer)
 	 ("C-x C-f" . counsel-find-file)
@@ -242,7 +243,7 @@
 (define-key global-map [remap execute-extended-command] #'helm-M-x)
 (define-key global-map [remap switch-to-buffer] #'helm-mini)
 (define-key global-map [remap switch-to-buffer] #'helm-mini)
-(global-set-key (kbd "M-x") 'helm-M-x)
+;; (global-set-key (kbd "M-x") 'helm-M-x)
 
 (which-key-mode)
 (add-hook 'c-mode-hook 'lsp)
@@ -357,3 +358,8 @@
   (evil-collection-define-key 'normal 'dired-mode-map
 			      "h" 'dired-up-directory
 			      "l" 'dired-find-file))
+
+(use-package dashboard
+  :ensure t
+  :config
+  (dashboard-setup-startup-hook))
