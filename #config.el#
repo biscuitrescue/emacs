@@ -177,24 +177,6 @@ _q_: quit
 (global-set-key (kbd "C-=") 'text-scale-increase)
 (global-set-key (kbd "C--") 'text-scale-decrease)
 
-(use-package dashboard
-  :ensure t
-  :init
-  (setq initial-buffer-choice 'dashboard-open)
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
-  (setq dashboard-startup-banner 'logo)
-  (setq dashboard-center-content t)
-  (setq dashboard-vertically-center-content t)
-  (setq dashboard-show-shortcuts nil)
-  (setq dashboard-items '((recents   . 5)
-                          (bookmarks . 3)
-                          (projects  . 3)
-                          (agenda    . 5)
-                          (registers . 3)))
-
-  (dashboard-setup-startup-hook))
-
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
@@ -203,8 +185,7 @@ _q_: quit
 (global-display-line-numbers-mode 1)
 (global-visual-line-mode t)
 
-(add-to-list 'custom-theme-load-path "~/.config/emacs/themes/")
-(load-theme 'black t)
+(load-theme 'modus-vivendi)
 
 (use-package toc-org
   :ensure t
@@ -248,50 +229,3 @@ _q_: quit
   (global-corfu-mode)
 
   (corfu-history-mode))
-
-;; Enable Vertico.
-(use-package vertico
-  :ensure t
-  :custom
-  (vertico-scroll-margin 0) ;; Different scroll margin
-  (vertico-count 20) ;; Show more candidates
-  (vertico-resize t) ;; Grow and shrink the Vertico minibuffer
-  (vertico-cycle t) ;; Enable cycling for `vertico-next/previous'
-  :init
-  (vertico-mode))
-
-;; Persist history over Emacs restarts. Vertico sorts by history position.
-(use-package savehist
-  :init
-  (savehist-mode))
-
-;; Emacs minibuffer configurations.
-
-(use-package projectile
-  :ensure t
-  :config
-  (projectile-mode 1))
-
-(use-package emacs
-  :custom
-  (context-menu-mode t)
-  (enable-recursive-minibuffers t)
-  (read-extended-command-predicate #'command-completion-default-include-p)
-
-  (tab-always-indent 'complete)
-  (text-mode-ispell-word-completion nil)
-  ;; Do not allow the cursor in the minibuffer prompt
-  (minibuffer-prompt-properties
-   '(read-only t cursor-intangible t face minibuffer-prompt)))
-
-(use-package vterm
-  :ensure t)
-(setq shell-file-name "/run/current-system/sw/bin/fish"
-      vterm-max-scrollback 5000)
-
-(use-package vterm-toggle
-  :after vterm
-  :ensure t
-  :config
-  (setq vterm-toggle-fullscreen-p nil)
-  (setq vterm-toggle-scope 'project))
