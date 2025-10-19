@@ -24,7 +24,9 @@
   - [[#toc][TOC]]
   - [[#org-bullets][Org Bullets]]
   - [[#electric-indent][Electric Indent]]
+- [[#diminish][Diminish]]
 - [[#code][Code]]
+  - [[#flycheck][Flycheck]]
   - [[#completion][Completion]]
   - [[#projectile][Projectile]]
 - [[#emacs-minibuf-config][Emacs minibuf config]]
@@ -254,14 +256,14 @@ ading programs
     (setq dashboard-set-heading-icons t)
     (setq dashboard-set-file-icons t)
     (setq dashboard-startup-banner 'logo)
-    (setq dashboard-center-content t)
-    (setq dashboard-vertically-center-content t)
+    ;; (setq dashboard-center-content t)
+    ;; (setq dashboard-vertically-center-content t)
     (setq dashboard-show-shortcuts nil)
-    (setq dashboard-items '((recents   . 5)
-                            (bookmarks . 3)
-                            (projects  . 3)
-                            (agenda    . 5)
-                            (registers . 3)))
+    ;; (setq dashboard-items '((recents   . 5)
+    ;;                         (bookmarks . 3)
+    ;;                         (projects  . 3)
+    ;;                         (agenda    . 5)
+    ;;                         (registers . 3)))
 
     (dashboard-setup-startup-hook))
 #+end_src
@@ -312,8 +314,35 @@ Table of Contents
   (setq electric-indent -1)
 #+end_src
 
+* Diminish
+#+begin_src emacs-lisp
+    (use-package diminish
+      :ensure t)
+
+#+end_src
+
 * Code
+** Flycheck
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :defer t
+    :diminish
+    :init (global-flycheck-mode))
+#+end_src
+
 ** Completion
+*** LSP
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    :ensure t
+    :commands (lsp lsp-deferred)
+    :init
+    (setq lsp-keymap-prefix "C-c l")
+    :config
+    (lsp-enable-which-key-integration t))
+#+end_src
+
 *** Corfu
 #+begin_src emacs-lisp
   (use-package corfu
@@ -367,7 +396,7 @@ Table of Contents
     (savehist-mode))
 
   ;; Emacs minibuffer configurations.
-  #+end_src
+#+end_src
 ** Projectile
 #+begin_src emacs-lisp
   (use-package projectile

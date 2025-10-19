@@ -184,14 +184,14 @@ _q_: quit
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
   (setq dashboard-startup-banner 'logo)
-  (setq dashboard-center-content t)
-  (setq dashboard-vertically-center-content t)
+  ;; (setq dashboard-center-content t)
+  ;; (setq dashboard-vertically-center-content t)
   (setq dashboard-show-shortcuts nil)
-  (setq dashboard-items '((recents   . 5)
-                          (bookmarks . 3)
-                          (projects  . 3)
-                          (agenda    . 5)
-                          (registers . 3)))
+  ;; (setq dashboard-items '((recents   . 5)
+  ;;                         (bookmarks . 3)
+  ;;                         (projects  . 3)
+  ;;                         (agenda    . 5)
+  ;;                         (registers . 3)))
 
   (dashboard-setup-startup-hook))
 
@@ -218,6 +218,23 @@ _q_: quit
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
 (setq electric-indent -1)
+
+(use-package diminish
+  :ensure t)
+
+(use-package flycheck
+  :ensure t
+  :defer t
+  :diminish
+  :init (global-flycheck-mode))
+
+(use-package lsp-mode
+  :ensure t
+  :commands (lsp lsp-deferred)
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :config
+  (lsp-enable-which-key-integration t))
 
 (use-package corfu
   :ensure t
