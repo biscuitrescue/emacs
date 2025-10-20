@@ -110,6 +110,7 @@
   ;; Files
   (cafo/leader-keys
     "." '(find-file :wk "Find file")
+    "SPC" '(projectile-find-file :wk "Find file in proj")
     "f" '(:ignore t :wk "Files")
     "f s" '(save-buffer :wk "Save buff")
     "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
@@ -122,6 +123,12 @@
     "h v" '(describe-variable :wk "Describe variable")
     "h r r" '((lambda () (interactive) (load-file "~/.config/emacs/init.el")) :wk "Reload emacs config")
     "TAB TAB" '(comment-line :wk "Comment Lines"))
+
+  (cafo/leader-keys
+    "o" '(:ignore t :wk "Open")
+    "o t" '(vterm-toggle :wk "Toggle Vterm")
+    "o T" '(vterm-toggle :wk "Toggle Vterm")
+    "o p" '(dired :wk "Open dired"))
 
   ;; Buffers
   (cafo/leader-keys
@@ -177,6 +184,10 @@ _q_: quit
 (global-set-key (kbd "C-=") 'text-scale-increase)
 (global-set-key (kbd "C--") 'text-scale-decrease)
 
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1))
+
 (use-package dashboard
   :ensure t
   :init
@@ -198,13 +209,26 @@ _q_: quit
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+(setq use-dialog-box nil)
+;; Use short y/n instead of full yes/no
+(setq use-short-answers t)
 
 (setq display-line-numbers-type 'relative)
 (global-display-line-numbers-mode 1)
 (global-visual-line-mode t)
 
+(use-package doom-themes
+  :ensure t
+  :custom
+  (doom-themes-enable-bold t)   ; if nil, bold is universally disabled
+  (doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  :config
+  (load-theme 'roseprime t)
+  (doom-themes-visual-bell-config)
+  (doom-themes-neotree-config)
+  (doom-themes-treemacs-config)
+  (doom-themes-org-config))
 (add-to-list 'custom-theme-load-path "~/.config/emacs/themes/")
-(load-theme 'black t)
 
 (use-package toc-org
   :ensure t
@@ -218,6 +242,7 @@ _q_: quit
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
 (setq electric-indent -1)
+(setq electric-pair-mode 1)
 
 (use-package diminish
   :ensure t)
@@ -234,7 +259,21 @@ _q_: quit
   :init
   (setq lsp-keymap-prefix "C-c l")
   :config
-  (lsp-enable-which-key-integration t))
+  (lsp-enable-which-key-integration t)
+  (setq lsp-completion-provider :none))
+
+(add-hook 'c-mode-hook #'lsp-deferred)
+(add-hook 'c++-mode-hook #'lsp-deferred)
+
+(defun my/setup-c-c++-completion ()
+  (setq-local completion-at-point-functions
+              (list (cape-capf-super
+                     #'lsp-completion-at-point
+                     #'cape-dabbrev
+                     #'cape-file))))
+
+(add-hook 'c-mode-hook #'my/setup-c-c++-completion)
+(add-hook 'c++-mode-hook #'my/setup-c-c++-completion)
 
 (use-package corfu
   :ensure t
@@ -259,12 +298,30 @@ _q_: quit
 	      ("S-<return>" . corfu-insert))
   
   :init
-  ;; Recommended: Enable Corfu globally.  Recommended since many modes provide
-  ;; Capfs and Dabbrev can be used globally (M-/).  See also the customization
-  ;; variable `global-corfu-modes' to exclude certain modes.
   (global-corfu-mode)
 
-  (corfu-history-mode))
+  (corfu-history-mode)
+  :config
+  (add-hook 'eshell-mode-hook
+	    (lambda () (setq-local corfu-quit-at-boundary t
+				   corfu-quit-no-match t
+				   corfu-auto nil)
+              (corfu-mode))))
+
+(use-package cape
+  :ensure t
+  :bind ("C-c p" . cape-prefix-map) ;; Alternative key: M-<tab>, M-p, M-+
+  ;; Alternatively bind Cape commands individually.
+  ;; :bind (("C-c p d" . cape-dabbrev)
+  ;;        ("C-c p h" . cape-history)
+  ;;        ("C-c p f" . cape-file)
+  ;;        ...)
+  :init
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block)
+  ;; ...
+)
 
 ;; Enable Vertico.
 (use-package vertico
