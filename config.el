@@ -191,6 +191,11 @@ _q_: quit
 (global-set-key (kbd "C-=") 'text-scale-increase)
 (global-set-key (kbd "C--") 'text-scale-decrease)
 
+(use-package rainbow-mode
+  :ensure t
+  :init
+  (rainbow-mode 1))
+
 (use-package doom-modeline
   :ensure t
   :init (doom-modeline-mode 1))
@@ -231,10 +236,11 @@ _q_: quit
   (doom-themes-enable-bold t)   ; if nil, bold is universally disabled
   (doom-themes-enable-italic t) ; if nil, italics is universally disabled
   :config
-  (load-theme 'latte t)
+  (load-theme 'roseprime t)
   (doom-themes-visual-bell-config)
   (doom-themes-neotree-config)
   (doom-themes-treemacs-config)
+  (doom-themes-popup-config)
   (doom-themes-org-config))
 (add-to-list 'custom-theme-load-path "~/.config/emacs/themes/")
 

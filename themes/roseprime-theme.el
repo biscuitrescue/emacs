@@ -50,11 +50,11 @@ determine the exact padding."
   "A dark theme based on Dracula theme"
 
   ;; name        default   256       16
-  ((bg         '("#111111" "#111111" "black"        ))
-   (bg-alt     '("#0e0e0e" "#0e0e0e" "black"        ))
-   (base0      '("#11111b" "#11111b" "black"        ))
-   (base1      '("#121315" "#121315" "brightblack"  ))
-   (base2      '("#16171b" "#16171b" "brightblack"  ))
+  ((bg         '("#121315" "#121315" "black"        ))
+   (bg-alt     '("#161616" "#161616" "black"        ))
+   (base0      '("#333333" "#333333" "black"        ))
+   (base1      '("#1e2024" "#1e2024" "brightblack"  ))
+   (base2      '("#333333" "#333333" "brightblack"  ))
    (base3      '("#262830" "#262830" "brightblack"  ))
    (base4      '("#585b70" "#585b70" "brightblack"  ))
    (base5      '("#6c7086" "#6c7086" "brightblack"  ))

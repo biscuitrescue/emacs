@@ -17,6 +17,7 @@
   - [[#font-face][Font face]]
   - [[#zooming-inout][Zooming In/Out]]
 - [[#ui][UI]]
+  - [[#rainbow-mode][Rainbow Mode]]
   - [[#modeline][Modeline]]
   - [[#dashboard][Dashboard]]
   - [[#disable-menubar-toolbar-scrollbar][Disable menubar, toolbar, scrollbar]]
@@ -268,6 +269,14 @@ ading programs
 #+end_src
 
 * UI
+** Rainbow Mode
+#+begin_src emacs-lisp
+  (use-package rainbow-mode
+    :ensure t
+    :init
+    (rainbow-mode 1))
+
+#+end_src
 
 ** Modeline
 #+begin_src emacs-lisp
@@ -321,10 +330,11 @@ ading programs
     (doom-themes-enable-bold t)   ; if nil, bold is universally disabled
     (doom-themes-enable-italic t) ; if nil, italics is universally disabled
     :config
-    (load-theme 'latte t)
+    (load-theme 'roseprime t)
     (doom-themes-visual-bell-config)
     (doom-themes-neotree-config)
     (doom-themes-treemacs-config)
+    (doom-themes-popup-config)
     (doom-themes-org-config))
   (add-to-list 'custom-theme-load-path "~/.config/emacs/themes/")
 #+end_src
