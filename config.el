@@ -49,7 +49,6 @@
 
 ;; Install use-package support
 (elpaca elpaca-use-package
-  ;; Enable use-package :ensure support for Elpaca.
   (elpaca-use-package-mode))
 
 ;;When installing a package used in the init file itself,
@@ -59,6 +58,8 @@
 ;;(use-package general :ensure (:wait t) :demand t)
 
 (use-package emacs :ensure nil :config (setq ring-bell-function #'ignore))
+
+(elpaca (transient :repo "magit/transient" :ref "v0.10.0"))
 
 ;; (require 'no-littering)
 ;; (let ((dir (no-littering-expand-var-file-name "lock-files/")))
@@ -104,6 +105,7 @@
 
 (use-package general
   :ensure t
+  (:wait t)
   :config
   (general-evil-setup)
   (general-create-definer cafo/leader-keys
@@ -247,8 +249,8 @@ _q_: quit
 (use-package org-bullets :ensure t)
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
-(setq electric-indent -1)
-(setq electric-pair-mode 1)
+(electric-indent-mode -1)
+(electric-pair-mode 1)
 
 (use-package diminish
   :ensure t)
@@ -265,25 +267,52 @@ _q_: quit
   :init
   (setq lsp-keymap-prefix "C-c l")
   :config
-  (lsp-enable-which-key-integration t)
-  (setq lsp-completion-provider :none))
+  (lsp-enable-which-key-integration t))
+;; (setq lsp-completion-provider :none))
 
 (add-hook 'c-mode-hook #'lsp-deferred)
 (add-hook 'c++-mode-hook #'lsp-deferred)
+(add-hook 'rust-mode-hook #'lsp-deferred)
 
-(defun my/setup-c-c++-completion ()
+(defun my/setup-global-lsp-completion ()
+  "Enable LSP + Cape + Corfu completions for the current buffer."
   (setq-local completion-at-point-functions
               (list (cape-capf-super
-                     #'lsp-completion-at-point
-                     #'cape-dabbrev
-                     #'cape-file))))
+                     #'lsp-completion-at-point  ; LSP completions
+                     #'cape-dabbrev              ; buffer words
+                     #'cape-file))))             ; file paths
 
-(add-hook 'c-mode-hook #'my/setup-c-c++-completion)
-(add-hook 'c++-mode-hook #'my/setup-c-c++-completion)
+;; Hook into all lsp-mode buffers
+(add-hook 'lsp-mode-hook #'my/setup-global-lsp-completion)
+
+(use-package lsp-ui
+  :ensure t
+  :commands lsp-ui-mode)
+
+(use-package rust-mode
+  :ensure (:wait t)
+  :mode "\\.rs\\'"
+  :config
+  (setq rust-format-on-save t))
+(with-eval-after-load 'flycheck
+  (setq-default flycheck-disabled-checkers '(rust-cargo))
+  (setq-default flycheck-checker 'lsp))
+
+(use-package nix-mode
+  :ensure t
+  :mode "\\.nix\\'"
+  :hook (nix-mode . lsp-deferred)) ;; start LSP automatically
+
+(with-eval-after-load 'lsp-mode
+  (add-to-list 'lsp-language-id-configuration '(nix-mode . "nix"))
+  (lsp-register-client
+   (make-lsp-client
+    :new-connection (lsp-stdio-connection "nil_ls")
+    :major-modes '(nix-mode)
+    :server-id 'nil-ls)))
 
 (use-package corfu
   :ensure t
-  ;; Optional customizations
   :custom
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   (corfu-auto t)
@@ -329,9 +358,24 @@ _q_: quit
   :init
   (add-hook 'completion-at-point-functions #'cape-dabbrev)
   (add-hook 'completion-at-point-functions #'cape-file)
-  (add-hook 'completion-at-point-functions #'cape-elisp-block)
-  ;; ...
-)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block))
+
+(defun my/setup-global-completion ()
+  "Set up Corfu + Cape + LSP completions in any LSP-enabled buffer."
+  (setq-local completion-at-point-functions
+              (list (cape-capf-super
+                     #'lsp-completion-at-point  ; LSP completions first
+                     #'cape-dabbrev              ; buffer words
+                     #'cape-file))))             ; file paths
+
+;; Hook this to all LSP buffers
+(add-hook 'lsp-mode-hook #'my/setup-global-completion)
+
+;; Optional: enable Corfu in minibuffer completions
+(add-hook 'completion-at-point-functions-hook
+          (lambda ()
+            (when (minibufferp)
+              (corfu-mode 1))))
 
 (use-package orderless
   :ensure t
@@ -490,8 +534,8 @@ _q_: quit
   :after vterm
   :ensure t
   :config
-  (setq vterm-toggle-fullscreen-p nil)
-  (setq vterm-toggle-scope 'project))
+  (setq vterm-toggle-fullscreen-p nil
+	  vterm-toggle-scope 'project))
 
 ;; (add-hook 'vterm-mode-hook (lambda () (display-line-numbers-mode -1)))
 (dolist (mode '(org-mode-hook
@@ -504,4 +548,8 @@ _q_: quit
   (add-hook mode (lambda() (display-line-numbers-mode -1))))
 
 (use-package magit
-  :ensure t)
+  :ensure t
+  :defer t
+  :commands (magit-status magit-log magit-commit)
+  :config
+  (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
