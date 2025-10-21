@@ -81,12 +81,18 @@
   :ensure t
   :after evil
   :config
-  (setq evil-collection-mode-list '(dashboard dired ibuffer))
+  (setq evil-collection-mode-list '(dashboard dired ibuffer magit elpaca))
   (evil-collection-init))
 
 (use-package evil-tutor
   :ensure t
   :after evil)
+
+(use-package evil-commentary
+  :ensure t
+  :after evil
+  :config
+  (evil-commentary-mode))
 
 (use-package which-key
   :ensure t
@@ -102,6 +108,9 @@
         which-key-sort-uppercase-first nil
         which-key-separator " → "
         which-key-allow-imprecise-window-fit t))
+
+(global-set-key (kbd "M-e") 'evil-end-of-line)
+(global-set-key (kbd "M-w") 'evil-first-non-blank)
 
 (use-package general
   :ensure t
@@ -119,17 +128,34 @@
     "." '(find-file :wk "Find file")
     "SPC" '(projectile-find-file :wk "Find file in proj")
     "f" '(:ignore t :wk "Files")
+    "f =" '(dired-create-empty-file :wk "Create file")
+    "-" '(dired-jump :wk "Dired jump")
     "f s" '(save-buffer :wk "Save buff")
     "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
     "w" '(evil-window-map :wk "Window"))
+  
+  ;; workspaces
+  (cafo/leader-keys
+    "TAB" '(:ignore t :wk "Workspaces")
+    "TAB TAB" '(persp-switch :wk "Switch workspace")
+    "TAB n"   '(persp-add-new :wk "Create workspace")
+    "TAB d"   '(persp-kill :wk "Delete workspace"))
+  
+  ;; Git
+  (cafo/leader-keys
+    "g" '(:ignore t :wk "Magit")
+    "g g" '(magit-status :wk "Magit Status")
+    "g s" '(magit-file-stage :wk "Magit Stage file") 
+    "g c" '(magit-commit :wk "Commit"))
 
   ;; Code
   (cafo/leader-keys
     "h" '(:ignore t :wk "Help")
     "h f" '(describe-function :wk "Describe function")
     "h v" '(describe-variable :wk "Describe variable")
-    "h r r" '((lambda () (interactive) (load-file "~/.config/emacs/init.el")) :wk "Reload emacs config")
-    "TAB TAB" '(comment-line :wk "Comment Lines"))
+    "h t" '(consult-theme :wk "Change Theme")
+    "h r r" '((lambda () (interactive) (load-file "~/.config/emacs/init.el")) :wk "Reload emacs config"))
+  ;; "TAB TAB" '(comment-line :wk "Comment Lines"))
 
   (cafo/leader-keys
     "o" '(:ignore t :wk "Open")
@@ -217,7 +243,7 @@ _q_: quit
   ;;                         (registers . 3)))
 
   (dashboard-setup-startup-hook))
-  ;; (add-hook 'dashboard-setup-startup-hook (lambda () (display-line-numbers-mode -1)))
+;; (add-hook 'dashboard-setup-startup-hook (lambda () (display-line-numbers-mode -1)))
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -225,6 +251,12 @@ _q_: quit
 (setq use-dialog-box nil)
 ;; Use short y/n instead of full yes/no
 (setq use-short-answers t)
+
+(setq scroll-margin 4)
+(indent-tabs-mode 1)
+(add-hook 'org-mode-hook (lambda () (setq tab-width 8)))
+(setq scroll-step 1
+      scroll-conservatively 10000)
 
 (setq display-line-numbers-type 'relative)
 (global-display-line-numbers-mode 1)
@@ -240,7 +272,6 @@ _q_: quit
   (doom-themes-visual-bell-config)
   (doom-themes-neotree-config)
   (doom-themes-treemacs-config)
-  (doom-themes-popup-config)
   (doom-themes-org-config))
 (add-to-list 'custom-theme-load-path "~/.config/emacs/themes/")
 
@@ -494,7 +525,7 @@ _q_: quit
   ;; Optionally make narrowing help available in the minibuffer.
   ;; You may want to use `embark-prefix-help-command' or which-key instead.
   ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
-)
+  )
 
 ;; Enable Vertico.
 (use-package vertico
@@ -531,6 +562,30 @@ _q_: quit
   (minibuffer-prompt-properties
    '(read-only t cursor-intangible t face minibuffer-prompt)))
 
+;; (use-package perspective
+;;   :ensure t
+;;   :bind
+;;   ("C-x C-b" . persp-list-buffers)         ; or use a nicer switcher, see below
+;;   :custom
+;;   (persp-mode-prefix-key (kbd "C-c M-p"))  ; pick your own prefix key here
+;;   :init
+;; (persp-mode 1))
+(use-package perspective
+  :ensure t
+  :demand t
+  :init
+  (setq persp-mode-prefix-key (kbd "C-c M-p"))
+  (setq persp-show-modestring nil) ;; we'll use tab-bar instead
+  :config
+  (persp-mode))
+
+;; optional: use tab-bar as a nice workspace indicator
+(setq tab-bar-show 1)
+(setq tab-bar-new-tab-choice "*scratch*")
+(setq tab-bar-close-button-show nil)
+(setq tab-bar-new-button-show nil)
+(tab-bar-mode 1)
+
 (use-package vterm
   :ensure t)
 (setq shell-file-name "/run/current-system/sw/bin/fish"
@@ -541,7 +596,7 @@ _q_: quit
   :ensure t
   :config
   (setq vterm-toggle-fullscreen-p nil
-	  vterm-toggle-scope 'project))
+	vterm-toggle-scope 'project))
 
 ;; (add-hook 'vterm-mode-hook (lambda () (display-line-numbers-mode -1)))
 (dolist (mode '(org-mode-hook
