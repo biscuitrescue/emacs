@@ -40,6 +40,7 @@
   - [[#vterm][Vterm]]
   - [[#vterm-toggle][Vterm Toggle]]
 - [[#magit][Magit]]
+- [[#zen-mode][Zen Mode]]
 
 * Init Lo
 ading programs
@@ -206,7 +207,15 @@ ading programs
         "TAB" '(:ignore t :wk "Workspaces")
         "TAB TAB" '(persp-switch :wk "Switch workspace")
         "TAB n"   '(persp-add-new :wk "Create workspace")
-        "TAB d"   '(persp-kill :wk "Delete workspace"))
+        ;; "TAB d"   '(persp-kill :wk "Delete workspace"))
+      
+      ;; Toggle
+  (cafo/leader-keys
+    "z" '(:ignore t :wk "Zed")
+    "z z" '(writeroom-mode :wk "Zen")
+    "z m" '(writeroom-toggle-mode-line :wk "Zen Toggle Modeline")
+    "z -" '(writeroom-decrease-width :wk "Zen dec width")
+    "z =" '(writeroom-increase-width :wk "Zen inc width"))
       
       ;; Git
       (cafo/leader-keys
@@ -777,3 +786,10 @@ Table of Contents
     (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 #+end_src
 
+* Zen Mode
+#+begin_src emacs-lisp
+  (use-package visual-fill-column
+    :ensure t)
+  (use-package writeroom-mode
+    :ensure t)
+#+end_src

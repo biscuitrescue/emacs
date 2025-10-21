@@ -113,66 +113,73 @@
 (global-set-key (kbd "M-w") 'evil-first-non-blank)
 
 (use-package general
-  :ensure t
-  (:wait t)
-  :config
-  (general-evil-setup)
-  (general-create-definer cafo/leader-keys
-    :states '(normal insert visual emacs)
-    :keymaps 'override
-    :prefix "SPC"
-    :global-prefix "M-SPC")
+    :ensure t
+    (:wait t)
+    :config
+    (general-evil-setup)
+    (general-create-definer cafo/leader-keys
+      :states '(normal insert visual emacs)
+      :keymaps 'override
+      :prefix "SPC"
+      :global-prefix "M-SPC")
 
-  ;; Files
-  (cafo/leader-keys
-    "." '(find-file :wk "Find file")
-    "SPC" '(projectile-find-file :wk "Find file in proj")
-    "f" '(:ignore t :wk "Files")
-    "f =" '(dired-create-empty-file :wk "Create file")
-    "-" '(dired-jump :wk "Dired jump")
-    "f s" '(save-buffer :wk "Save buff")
-    "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
-    "w" '(evil-window-map :wk "Window"))
-  
-  ;; workspaces
-  (cafo/leader-keys
-    "TAB" '(:ignore t :wk "Workspaces")
-    "TAB TAB" '(persp-switch :wk "Switch workspace")
-    "TAB n"   '(persp-add-new :wk "Create workspace")
-    "TAB d"   '(persp-kill :wk "Delete workspace"))
-  
-  ;; Git
-  (cafo/leader-keys
-    "g" '(:ignore t :wk "Magit")
-    "g g" '(magit-status :wk "Magit Status")
-    "g s" '(magit-file-stage :wk "Magit Stage file") 
-    "g c" '(magit-commit :wk "Commit"))
+    ;; Files
+    (cafo/leader-keys
+      "." '(find-file :wk "Find file")
+      "SPC" '(projectile-find-file :wk "Find file in proj")
+      "f" '(:ignore t :wk "Files")
+      "f =" '(dired-create-empty-file :wk "Create file")
+      "-" '(dired-jump :wk "Dired jump")
+      "f s" '(save-buffer :wk "Save buff")
+      "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
+      "w" '(evil-window-map :wk "Window"))
+    
+    ;; workspaces
+    (cafo/leader-keys
+      "TAB" '(:ignore t :wk "Workspaces")
+      "TAB TAB" '(persp-switch :wk "Switch workspace")
+      "TAB n"   '(persp-add-new :wk "Create workspace")
+      "TAB d"   '(persp-kill :wk "Delete workspace"))
+    
+    ;; Toggle
+(cafo/leader-keys
+  "z" '(:ignore t :wk "Zed")
+  "z z" '(writeroom-mode :wk "Zen")
+  "z -" '(writeroom-decrease-width :wk "Zen dec width")
+  "z =" '(writeroom-increase-width :wk "Zen inc width"))
+    
+    ;; Git
+    (cafo/leader-keys
+      "g" '(:ignore t :wk "Magit")
+      "g g" '(magit-status :wk "Magit Status")
+      "g s" '(magit-file-stage :wk "Magit Stage file") 
+      "g c" '(magit-commit :wk "Commit"))
 
-  ;; Code
-  (cafo/leader-keys
-    "h" '(:ignore t :wk "Help")
-    "h f" '(describe-function :wk "Describe function")
-    "h v" '(describe-variable :wk "Describe variable")
-    "h t" '(consult-theme :wk "Change Theme")
-    "h r r" '((lambda () (interactive) (load-file "~/.config/emacs/init.el")) :wk "Reload emacs config"))
-  ;; "TAB TAB" '(comment-line :wk "Comment Lines"))
+    ;; Code
+    (cafo/leader-keys
+      "h" '(:ignore t :wk "Help")
+      "h f" '(describe-function :wk "Describe function")
+      "h v" '(describe-variable :wk "Describe variable")
+      "h t" '(consult-theme :wk "Change Theme")
+      "h r r" '((lambda () (interactive) (load-file "~/.config/emacs/init.el")) :wk "Reload emacs config"))
+    ;; "TAB TAB" '(comment-line :wk "Comment Lines"))
 
-  (cafo/leader-keys
-    "o" '(:ignore t :wk "Open")
-    "o t" '(vterm-toggle :wk "Toggle Vterm")
-    "o T" '(vterm-toggle :wk "Toggle Vterm")
-    "o p" '(dired :wk "Open dired"))
+    (cafo/leader-keys
+      "o" '(:ignore t :wk "Open")
+      "o t" '(vterm-toggle :wk "Toggle Vterm")
+      "o T" '(vterm-toggle :wk "Toggle Vterm")
+      "o p" '(dired :wk "Open dired"))
 
-  ;; Buffers
-  (cafo/leader-keys
-    "b" '(:ignore t :wk "buffer")
-    "b b" '(switch-to-buffer :wk "Switch Buffer")
-    "b i" '(ibuffer :wk "IBuffer")
-    "b c" '(kill-this-buffer :wk "Kill this Buffer")
-    "b n" '(next-buffer :wk "Next Buffer")
-    "b p" '(previous-buffer :wk "Prev Buffer")
-    "b r" '(revert-buffer :wk "Reload Buffer"))
-  )
+    ;; Buffers
+    (cafo/leader-keys
+      "b" '(:ignore t :wk "buffer")
+      "b b" '(switch-to-buffer :wk "Switch Buffer")
+      "b i" '(ibuffer :wk "IBuffer")
+      "b c" '(kill-this-buffer :wk "Kill this Buffer")
+      "b n" '(next-buffer :wk "Next Buffer")
+      "b p" '(previous-buffer :wk "Prev Buffer")
+      "b r" '(revert-buffer :wk "Reload Buffer"))
+    )
 
 (use-package hydra
   :ensure t
@@ -614,3 +621,8 @@ _q_: quit
   :commands (magit-status magit-log magit-commit)
   :config
   (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+(use-package visual-fill-column
+  :ensure t)
+(use-package writeroom-mode
+  :ensure t)
