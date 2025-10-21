@@ -53,9 +53,9 @@ ading programs
   (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
   (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
   (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-  			      :ref nil :depth 1 :inherit ignore
-  			      :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-  			      :build (:not elpaca--activate-package)))
+    			      :ref nil :depth 1 :inherit ignore
+    			      :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+    			      :build (:not elpaca--activate-package)))
   (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
          (build (expand-file-name "elpaca/" elpaca-builds-directory))
          (order (cdr elpaca-order))
@@ -111,7 +111,7 @@ ading programs
 
   (elpaca (transient :repo "magit/transient" :ref "v0.10.0"))
 
-
+  ;; Add this to your config, for example near your other (use-package ...) blocks
 #+end_src
 
 * No Littering
@@ -207,7 +207,7 @@ ading programs
         "TAB" '(:ignore t :wk "Workspaces")
         "TAB TAB" '(persp-switch :wk "Switch workspace")
         "TAB n"   '(persp-add-new :wk "Create workspace")
-        ;; "TAB d"   '(persp-kill :wk "Delete workspace"))
+        "TAB d"   '(persp-kill :wk "Delete workspace"))
       
       ;; Toggle
   (cafo/leader-keys
