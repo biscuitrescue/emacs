@@ -9,10 +9,8 @@
   - [[#elpaca][Elpaca]]
 - [[#no-littering][No Littering]]
 - [[#keybinds][Keybinds]]
-  - [[#evil][Evil]]
   - [[#which-key][Which-Key]]
   - [[#navigation][Navigation]]
-  - [[#general][General]]
   - [[#hydra][Hydra]]
 - [[#fonts][Fonts]]
   - [[#font-face][Font face]]
@@ -40,22 +38,22 @@
   - [[#vterm][Vterm]]
   - [[#vterm-toggle][Vterm Toggle]]
 - [[#magit][Magit]]
-- [[#zen-mode][Zen Mode]]
 
 * Init Lo
 ading programs
 
 ** Elpaca
+Elpaca
 
 #+begin_src emacs-lisp
-  (defvar elpaca-installer-version 0.11)
+  (defvar elpaca-installer-version 0.12)
   (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
   (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
   (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
   (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-    			      :ref nil :depth 1 :inherit ignore
-    			      :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-    			      :build (:not elpaca--activate-package)))
+                                :ref nil :depth 1 :inherit ignore
+                                :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                                :build (:not elpaca--activate-package)))
   (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
          (build (expand-file-name "elpaca/" elpaca-builds-directory))
          (order (cdr elpaca-order))
@@ -87,73 +85,30 @@ ading programs
   (add-hook 'after-init-hook #'elpaca-process-queues)
   (elpaca `(,@elpaca-order))
 
-  ;; Install a package via the elpaca macro
-  ;; See the "recipes" section of the manual for more details.
-
-  ;; (elpaca example-package)
-
-  ;; Install a package via the elpaca macro
-  ;; See the "recipes" section of the manual for more details.
-
-  ;; (elpaca example-package)
-
   ;; Install use-package support
   (elpaca elpaca-use-package
-    (elpaca-use-package-mode))
+    (elpaca-use-package-mode)
+    (setq elpaca-use-package-by-default t))
 
-  ;;When installing a package used in the init file itself,
-  ;;e.g. a package which adds a use-package key word,
-  ;;use the :wait recipe keyword to block until that package is installed/configured.
-  ;;For example:
-  ;;(use-package general :ensure (:wait t) :demand t)
+  ;; Block until elpaca-use-package is ready
+  (elpaca-wait)
 
-  (use-package emacs :ensure nil :config (setq ring-bell-function #'ignore))
-
-  (elpaca (transient :repo "magit/transient" :ref "v0.10.0"))
-
-  ;; Add this to your config, for example near your other (use-package ...) blocks
+  ;; Now it is safe to use use-package
+  (use-package emacs
+    :elpaca nil
+    :ensure nil
+    :config
+    (setq ring-bell-function #'ignore))
 #+end_src
 
 * No Littering
 #+begin_src emacs-lisp
-  ;; (require 'no-littering)
-  ;; (let ((dir (no-littering-expand-var-file-name "lock-files/")))
-  ;;   (make-directory dir t)
-  ;;   (setq lock-file-name-transforms `((".*" ,dir t))))
+(setq make-backup-files nil)
+(setq auto-save-default nil)
+(setq create-lockfiles nil)
 #+end_src
 
 * Keybinds
-** Evil
-#+begin_src emacs-lisp
-  (use-package evil
-    :ensure t
-    :init
-    (setq evil-want-integration t
-          evil-want-keybinding nil
-          evil-vsplit-window-right t
-          evil-split-window-below t)
-    :config
-    (evil-set-undo-system 'undo-redo)
-    (evil-mode 1))
-
-  (use-package evil-collection
-    :ensure t
-    :after evil
-    :config
-    (setq evil-collection-mode-list '(dashboard dired ibuffer magit elpaca))
-    (evil-collection-init))
-
-  (use-package evil-tutor
-    :ensure t
-    :after evil)
-
-  (use-package evil-commentary
-    :ensure t
-    :after evil
-    :config
-    (evil-commentary-mode))
-#+end_src
-
 ** Which-Key
 #+begin_src emacs-lisp
   (use-package which-key
@@ -173,106 +128,39 @@ ading programs
 #+end_src
 
 ** Navigation
+*** Ace
 #+begin_src emacs-lisp
-  (global-set-key (kbd "M-e") 'evil-end-of-line)
-  (global-set-key (kbd "M-w") 'evil-first-non-blank)
-
-#+end_src
-** General
-#+begin_src emacs-lisp
-    (use-package general
+    (use-package ace-jump-mode
+      :ensure t)
+    (use-package ace-window
       :ensure t
-      (:wait t)
       :config
-      (general-evil-setup)
-      (general-create-definer cafo/leader-keys
-        :states '(normal insert visual emacs)
-        :keymaps 'override
-        :prefix "SPC"
-        :global-prefix "M-SPC")
-
-      ;; Files
-      (cafo/leader-keys
-        "." '(find-file :wk "Find file")
-        "SPC" '(projectile-find-file :wk "Find file in proj")
-        "f" '(:ignore t :wk "Files")
-        "f =" '(dired-create-empty-file :wk "Create file")
-        "-" '(dired-jump :wk "Dired jump")
-        "f s" '(save-buffer :wk "Save buff")
-        "f c" '((lambda () (interactive) (find-file "~/.config/emacs/config.org")) :wk "Edit emacs config")
-        "w" '(evil-window-map :wk "Window"))
-      
-      ;; workspaces
-      (cafo/leader-keys
-        "TAB" '(:ignore t :wk "Workspaces")
-        "TAB TAB" '(persp-switch :wk "Switch workspace")
-        "TAB n"   '(persp-add-new :wk "Create workspace")
-        "TAB d"   '(persp-kill :wk "Delete workspace"))
-      
-      ;; Toggle
-  (cafo/leader-keys
-    "z" '(:ignore t :wk "Zed")
-    "z z" '(writeroom-mode :wk "Zen")
-    "z m" '(writeroom-toggle-mode-line :wk "Zen Toggle Modeline")
-    "z -" '(writeroom-decrease-width :wk "Zen dec width")
-    "z =" '(writeroom-increase-width :wk "Zen inc width"))
-      
-      ;; Git
-      (cafo/leader-keys
-        "g" '(:ignore t :wk "Magit")
-        "g g" '(magit-status :wk "Magit Status")
-        "g s" '(magit-file-stage :wk "Magit Stage file") 
-        "g c" '(magit-commit :wk "Commit"))
-
-      ;; Code
-      (cafo/leader-keys
-        "h" '(:ignore t :wk "Help")
-        "h f" '(describe-function :wk "Describe function")
-        "h v" '(describe-variable :wk "Describe variable")
-        "h t" '(consult-theme :wk "Change Theme")
-        "h r r" '((lambda () (interactive) (load-file "~/.config/emacs/init.el")) :wk "Reload emacs config"))
-      ;; "TAB TAB" '(comment-line :wk "Comment Lines"))
-
-      (cafo/leader-keys
-        "o" '(:ignore t :wk "Open")
-        "o t" '(vterm-toggle :wk "Toggle Vterm")
-        "o T" '(vterm-toggle :wk "Toggle Vterm")
-        "o p" '(dired :wk "Open dired"))
-
-      ;; Buffers
-      (cafo/leader-keys
-        "b" '(:ignore t :wk "buffer")
-        "b b" '(switch-to-buffer :wk "Switch Buffer")
-        "b i" '(ibuffer :wk "IBuffer")
-        "b c" '(kill-this-buffer :wk "Kill this Buffer")
-        "b n" '(next-buffer :wk "Next Buffer")
-        "b p" '(previous-buffer :wk "Prev Buffer")
-        "b r" '(revert-buffer :wk "Reload Buffer"))
-      )
-
+      (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+      :bind ("M-o" . ace-window))
 #+end_src
 
 ** Hydra
 #+begin_src emacs-lisp
-  (use-package hydra
-    :ensure t
-    :config
-    ;; Window resize hydra
-    (defhydra hydra-window-resize (:hint nil)
-      "
-  Resize window:
-  _h_: ←  _l_: →  _j_: ↓  _k_: ↑
-  _q_: quit
-  "
-      ("h" enlarge-window-horizontally)
-      ("l" shrink-window-horizontally)
-      ("j" shrink-window)
-      ("k" enlarge-window)
-      ("q" nil "quit"))
+    ;; (use-package hydra
+    ;;   :ensure t
+    ;;   :config
+    ;;   ;; Window resize hydra
+    ;;   (defhydra hydra-window-resize (:hint nil)
+    ;;     "
+    ;; Resize window:
+    ;; _h_: ←  _l_: →  _j_: ↓  _k_: ↑
+    ;; _q_: quit
+    ;; "
+    ;;     ("h" enlarge-window-horizontally)
+    ;;     ("l" shrink-window-horizontally)
+    ;;     ("j" shrink-window)
+    ;;     ("k" enlarge-window)
+    ;;     ("q" nil "quit"))
 
-    ;; Bind hydra to leader key: SPC w r
-    (cafo/leader-keys
-      "w r" '(hydra-window-resize/body :which-key "Resize Window")))
+    ;;   ;; Bind hydra to leader key: SPC w r
+    ;;   (cafo/leader-keys
+    ;;     "w r" '(hydra-window-resize/body :which-key "Resize Window")))
+
 #+end_src
 
 * Fonts
@@ -280,23 +168,21 @@ ading programs
 #+begin_src emacs-lisp
 
   (set-face-attribute 'default nil
-     		    :font "Zed Mono"
-     		    :height 150
+     		    :font "Monaspace Argon NF"
+     		    :height 130
      		    :weight 'medium)
   (set-face-attribute 'variable-pitch nil
-     		    :font "Zed Mono"
+     		    :font "Monaspace Argon NF"
      		    :height 150
      		    :weight 'medium)
   (set-face-attribute 'fixed-pitch nil
-     		    :font "Zed Mono"
+     		    :font "Monaspace Argon NF"
      		    :height 150;
      		    :weight 'medium)
   (set-face-attribute 'font-lock-comment-face nil
      		    :slant 'italic)
   (set-face-attribute 'font-lock-keyword-face nil
      		    :slant 'italic)
-
-  ;; (add-to-list 'default-frame-alist '(font . "Fira Code-13))
   (setq-default line-spacing 0.12)
 
 #+end_src
@@ -321,8 +207,8 @@ ading programs
 ** Modeline
 #+begin_src emacs-lisp
   (use-package doom-modeline
-    :ensure t
-    :init (doom-modeline-mode 1))
+     :ensure t
+     :init (doom-modeline-mode 1))
 #+end_src
 ** Dashboard
 #+begin_src emacs-lisp
@@ -363,6 +249,7 @@ ading programs
   (add-hook 'org-mode-hook (lambda () (setq tab-width 8)))
   (setq scroll-step 1
         scroll-conservatively 10000)
+;;  (setq-default mode-line-format " %* %b %l:%C %*")
 #+end_src
 ** Line Numbers
 #+begin_src emacs-lisp
@@ -372,18 +259,24 @@ ading programs
 #+end_src
 ** Theme 
 #+begin_src emacs-lisp
-  (use-package doom-themes
+    ;; (use-package doom-themes
+    ;;   :ensure t
+    ;;   :custom
+    ;;   (doom-themes-enable-bold t)   ; if nil, bold is universally disabled
+    ;;   (doom-themes-enable-italic t) ; if nil, italics is universally disabled
+    ;;   :config
+    ;;   (load-theme 'roseprime t)
+    ;;   (doom-themes-visual-bell-config)
+    ;;   (doom-themes-neotree-config)
+    ;;   (doom-themes-treemacs-config)
+    ;;   (doom-themes-org-config))
+    ;; (add-to-list 'custom-theme-load-path "~/config/doom/themes/")
+    ;; (add-to-list 'load-path (concat user-emacs-directory "site-lisp"))
+    ;; (require 'kanagawa-themes)
+  (use-package kanagawa-themes
     :ensure t
-    :custom
-    (doom-themes-enable-bold t)   ; if nil, bold is universally disabled
-    (doom-themes-enable-italic t) ; if nil, italics is universally disabled
     :config
-    (load-theme 'roseprime t)
-    (doom-themes-visual-bell-config)
-    (doom-themes-neotree-config)
-    (doom-themes-treemacs-config)
-    (doom-themes-org-config))
-  (add-to-list 'custom-theme-load-path "~/.config/emacs/themes/")
+    (load-theme 'kanagawa-dragon t))
 #+end_src
 
 * ORG Mode
@@ -446,6 +339,7 @@ Table of Contents
   (add-hook 'c-mode-hook #'lsp-deferred)
   (add-hook 'c++-mode-hook #'lsp-deferred)
   (add-hook 'rust-mode-hook #'lsp-deferred)
+  ;; (add-hook 'zig-mode-hook #'lsp-dsdeferred)
 
   (defun my/setup-global-lsp-completion ()
     "Enable LSP + Cape + Corfu completions for the current buffer."
@@ -470,6 +364,17 @@ Table of Contents
   (with-eval-after-load 'flycheck
     (setq-default flycheck-disabled-checkers '(rust-cargo))
     (setq-default flycheck-checker 'lsp))
+  (use-package zig-mode
+    :ensure t
+    :mode "\\.zig\\'"
+    :hook (zig-mode . lsp-deferred))
+  (with-eval-after-load 'lsp-mode
+    (add-to-list 'lsp-language-id-configuration '(zig-mode . "zig"))
+    (lsp-register-client
+     (make-lsp-client
+      :new-connection (lsp-stdio-connection "zls")
+      :major-modes '(zig-mode)
+      :server-id 'zls)))
 
   (use-package nix-mode
     :ensure t
@@ -689,9 +594,7 @@ Table of Contents
     (vertico-mode))
 
   ;; Persist history over Emacs restarts. Vertico sorts by history position.
-  (use-package savehist
-    :init
-    (savehist-mode))
+  (savehist-mode)
 
   ;; Emacs minibuffer configurations.
 #+end_src
@@ -705,6 +608,8 @@ Table of Contents
 * Emacs minibuf config
 #+begin_src emacs-lisp
   (use-package emacs
+    :elpaca nil
+    :ensure nil
     :custom
     (context-menu-mode t)
     (enable-recursive-minibuffers t)
@@ -751,7 +656,7 @@ Table of Contents
 #+begin_src emacs-lisp
   (use-package vterm
     :ensure t)
-  (setq shell-file-name "/run/current-system/sw/bin/fish"
+  (setq shell-file-name "/bin/fish"
         vterm-max-scrollback 5000)
 #+end_src
 ** Vterm Toggle
@@ -778,7 +683,14 @@ Table of Contents
 
 * Magit
 #+begin_src emacs-lisp
+(elpaca (transient :fetcher github :repo "magit/transient"))
+(elpaca (magit-section :fetcher github :repo "magit/magit"
+                       :files ("lisp/magit-section.el")))
   (use-package magit
+    :elpaca (magit :fetcher github :repo "magit/magit"
+                   :files ("lisp/magit.el" "lisp/magit*.el" "lisp/git-rebase.el" 
+                           "docs/magit.texi" "magit-pkg.el"))
+    :after transient
     :ensure t
     :defer t
     :commands (magit-status magit-log magit-commit)
@@ -786,10 +698,8 @@ Table of Contents
     (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 #+end_src
 
-* Zen Mode
 #+begin_src emacs-lisp
-  (use-package visual-fill-column
-    :ensure t)
-  (use-package writeroom-mode
-    :ensure t)
+  (setq native-comp-async-report-warnings-errors 'silent)
+  (setq warning-minimum-level :error) ;; Only show actual errors, not warnings
+  (setq ad-redefinition-action 'accept) ;; Silence warnings about function redefinitions
 #+end_src

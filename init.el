@@ -8,7 +8,9 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("a1dbca0b2f8cc8cf17ec2b74b355864a04eb855e17a672925c53e24e1312b7c0"
+   '("d2ab3d4f005a9ad4fb789a8f65606c72f30ce9d281a9e42da55f7f4b9ef5bfc6"
+     "e01528890c08e063ec5288bcb351856bf14ea0c33ca9ae26d4aac4e52db5989b"
+     "a1dbca0b2f8cc8cf17ec2b74b355864a04eb855e17a672925c53e24e1312b7c0"
      "ddbc8f83b00dd7d9d270b5a83bc04926414637e4cd592f349f4a274342a857b2"
      "2a6ab8835e13705fdad0c41149a4665e332a013e3a87eaf5112bac36d15a554b"
      "cc8d317655a127396c49d79351f89adf327ee99f2477903a1e3cb08d3ff0ac70"
@@ -24,7 +26,7 @@
      "6b68dac76f392f443d823a745917c4d2d41db5d47719858963efc2dafca6cac4"
      "fa63a24332bf5d6ae4410fadaa9a176ab7c3297ea36e3fd637314aa25dcfb74e"
      default))
- '(package-selected-packages '(llama magit nix-mode transient writegood-mode)))
+ '(package-selected-packages nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
