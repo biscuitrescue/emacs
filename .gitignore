@@ -8,3 +8,9 @@
 /history
 /var
 /config.el
+/projectile*
+.lsp*
+/tramp
+/ido.last
+/games/
+/eshell/

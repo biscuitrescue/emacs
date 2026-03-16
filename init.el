@@ -8,7 +8,8 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("d2ab3d4f005a9ad4fb789a8f65606c72f30ce9d281a9e42da55f7f4b9ef5bfc6"
+   '("daa27dcbe26a280a9425ee90dc7458d85bd540482b93e9fa94d4f43327128077"
+     "d2ab3d4f005a9ad4fb789a8f65606c72f30ce9d281a9e42da55f7f4b9ef5bfc6"
      "e01528890c08e063ec5288bcb351856bf14ea0c33ca9ae26d4aac4e52db5989b"
      "a1dbca0b2f8cc8cf17ec2b74b355864a04eb855e17a672925c53e24e1312b7c0"
      "ddbc8f83b00dd7d9d270b5a83bc04926414637e4cd592f349f4a274342a857b2"
@@ -32,4 +33,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(fringe ((t (:background "#181616"))))
+ '(line-number ((t (:background "#181616"))))
+ '(line-number-current-line ((t (:background "#181616")))))

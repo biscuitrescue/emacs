@@ -5,10 +5,11 @@
 #+OPTIONS: toc:2
 
 * TOC :toc:
-- [[#init-lo][Init Lo]]
+- [[#init-loading-programs][Init Loading programs]]
   - [[#elpaca][Elpaca]]
 - [[#no-littering][No Littering]]
 - [[#keybinds][Keybinds]]
+  - [[#basic-binds][Basic Binds]]
   - [[#which-key][Which-Key]]
   - [[#navigation][Navigation]]
   - [[#hydra][Hydra]]
@@ -20,14 +21,15 @@
   - [[#modeline][Modeline]]
   - [[#dashboard][Dashboard]]
   - [[#disable-menubar-toolbar-scrollbar][Disable menubar, toolbar, scrollbar]]
+  - [[#popup-menu][Popup menu]]
   - [[#basic-conf][Basic conf]]
   - [[#line-numbers][Line Numbers]]
   - [[#theme][Theme]]
+- [[#diminish][Diminish]]
 - [[#org-mode][ORG Mode]]
   - [[#toc][TOC]]
   - [[#org-bullets][Org Bullets]]
   - [[#electric-indent][Electric Indent]]
-- [[#diminish][Diminish]]
 - [[#code][Code]]
   - [[#flycheck][Flycheck]]
   - [[#completion][Completion]]
@@ -38,9 +40,13 @@
   - [[#vterm][Vterm]]
   - [[#vterm-toggle][Vterm Toggle]]
 - [[#magit][Magit]]
+- [[#exwm][EXWM]]
+- [[#utils][Utils]]
+  - [[#zen-mode][Zen Mode]]
+  - [[#tab-line-mode][Tab line Mode]]
+  - [[#tab-bar-mode][Tab Bar Mode]]
 
-* Init Lo
-ading programs
+* Init Loading programs
 
 ** Elpaca
 Elpaca
@@ -103,12 +109,16 @@ Elpaca
 
 * No Littering
 #+begin_src emacs-lisp
-(setq make-backup-files nil)
-(setq auto-save-default nil)
-(setq create-lockfiles nil)
+  (setq make-backup-files nil)
+  (setq auto-save-default nil)
+  (setq create-lockfiles nil)
 #+end_src
 
 * Keybinds
+** Basic Binds
+#+begin_src emacs-lisp
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+#+end_src
 ** Which-Key
 #+begin_src emacs-lisp
   (use-package which-key
@@ -130,37 +140,72 @@ Elpaca
 ** Navigation
 *** Ace
 #+begin_src emacs-lisp
-    (use-package ace-jump-mode
-      :ensure t)
-    (use-package ace-window
-      :ensure t
-      :config
-      (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
-      :bind ("M-o" . ace-window))
+  (use-package ace-jump-mode
+    :ensure t)
+  (use-package ace-window
+    :ensure t
+    :config
+    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+    :bind ("M-o" . ace-window))
 #+end_src
 
 ** Hydra
 #+begin_src emacs-lisp
-    ;; (use-package hydra
-    ;;   :ensure t
-    ;;   :config
-    ;;   ;; Window resize hydra
-    ;;   (defhydra hydra-window-resize (:hint nil)
-    ;;     "
-    ;; Resize window:
-    ;; _h_: ←  _l_: →  _j_: ↓  _k_: ↑
-    ;; _q_: quit
-    ;; "
-    ;;     ("h" enlarge-window-horizontally)
-    ;;     ("l" shrink-window-horizontally)
-    ;;     ("j" shrink-window)
-    ;;     ("k" enlarge-window)
-    ;;     ("q" nil "quit"))
+  ;; (use-package hydra
+  ;;   :ensure t
+  ;;   :config
+  ;;   ;; Window resize hydra
+  ;;   (defhydra hydra-window-resize (:hint nil)
+  ;;     "
+  ;; Resize window:
+  ;; _h_: ←  _l_: →  _j_: ↓  _k_: ↑
+  ;; _q_: quit
+  ;; "
+  ;;     ("h" enlarge-window-horizontally)
+  ;;     ("l" shrink-window-horizontally)
+  ;;     ("j" shrink-window)
+  ;;     ("k" enlarge-window)
+  ;;     ("q" nil "quit"))
 
-    ;;   ;; Bind hydra to leader key: SPC w r
-    ;;   (cafo/leader-keys
-    ;;     "w r" '(hydra-window-resize/body :which-key "Resize Window")))
+  ;;   ;; Bind hydra to leader key: SPC w r
+  ;;   (cafo/leader-keys
+  ;;     "w r" '(hydra-window-resize/body :which-key "Resize Window")))
+  (defvar resize-frame-map
+    (let ((map (make-keymap)))
+      (define-key map (kbd "<up>") 'enlarge-window)
+      (define-key map (kbd "<down>") 'shrink-window)
+      (define-key map (kbd "<right>") 'enlarge-window-horizontally)
+      (define-key map (kbd "<left>") 'shrink-window-horizontally)
+      (set-char-table-range (nth 1 map) t 'resize-frame-done)
+      (define-key map (kbd "C-p") 'enlarge-window)
+      (define-key map (kbd "C-n") 'shrink-window)
+      (define-key map (kbd "C-f") 'enlarge-window-horizontally)
+      (define-key map (kbd "C-b") 'shrink-window-horizontally)
+      map))
 
+  (define-minor-mode resize-frame
+    "A simple minor mode to resize-frame.
+  C-c C-c to apply."
+    ;; The initial value.
+    :init-value nil
+    ;; The indicator for the mode line.
+    :lighter " ResizeFrame"
+    ;; The minor mode bindings.
+    :keymap resize-frame-map
+    :global t
+    (if (<= (length (window-list)) 1)
+        (progn (setq resize-frame nil)
+               (message "Only root frame exists, abort."))
+      (message "Use arrow-keys to adjust frames.")))
+
+  (defun resize-frame-done ()
+    (interactive)
+    (setq resize-frame nil)
+    (message "Done."))
+
+  (global-set-key (kbd "ESC `") 'resize-frame)
+
+  (provide 'resize-frame)
 #+end_src
 
 * Fonts
@@ -168,16 +213,16 @@ Elpaca
 #+begin_src emacs-lisp
 
   (set-face-attribute 'default nil
-     		    :font "Monaspace Argon NF"
-     		    :height 130
+     		    :font "mononoki nerd font"
+     		    :height 150
      		    :weight 'medium)
   (set-face-attribute 'variable-pitch nil
      		    :font "Monaspace Argon NF"
-     		    :height 150
+     		    :height 170
      		    :weight 'medium)
   (set-face-attribute 'fixed-pitch nil
      		    :font "Monaspace Argon NF"
-     		    :height 150;
+     		    :height 170;
      		    :weight 'medium)
   (set-face-attribute 'font-lock-comment-face nil
      		    :slant 'italic)
@@ -207,8 +252,8 @@ Elpaca
 ** Modeline
 #+begin_src emacs-lisp
   (use-package doom-modeline
-     :ensure t
-     :init (doom-modeline-mode 1))
+    :ensure t
+    :init (doom-modeline-mode 1))
 #+end_src
 ** Dashboard
 #+begin_src emacs-lisp
@@ -237,11 +282,28 @@ Elpaca
   (menu-bar-mode -1)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
+  (window-divider-mode -1)
   (setq use-dialog-box nil)
   ;; Use short y/n instead of full yes/no
   (setq use-short-answers t)
+  (modify-all-frames-parameters
+   '((right-divider-width . 0)
+     (internal-border-width . 0)))
+  (dolist (face '(window-divider
+                  window-divider-first-pixel
+                  window-divider-last-pixel))
+    (face-spec-reset-face face)
+    (set-face-foreground face (face-attribute 'default :background)))
+  (set-face-background 'fringe (face-attribute 'default :background))
 #+end_src
 
+** Popup menu
+#+begin_src emacs-lisp
+      (use-package ace-popup-menu
+        :ensure t
+        :config
+        (ace-popup-menu-mode 1))
+#+end_src
 ** Basic conf
 #+begin_src emacs-lisp
   (setq scroll-margin 4)
@@ -249,7 +311,7 @@ Elpaca
   (add-hook 'org-mode-hook (lambda () (setq tab-width 8)))
   (setq scroll-step 1
         scroll-conservatively 10000)
-;;  (setq-default mode-line-format " %* %b %l:%C %*")
+  ;;  (setq-default mode-line-format " %* %b %l:%C %*")
 #+end_src
 ** Line Numbers
 #+begin_src emacs-lisp
@@ -257,26 +319,41 @@ Elpaca
   (global-display-line-numbers-mode 1)
   (global-visual-line-mode t)
 #+end_src
-** Theme 
+** Theme
 #+begin_src emacs-lisp
-    ;; (use-package doom-themes
-    ;;   :ensure t
-    ;;   :custom
-    ;;   (doom-themes-enable-bold t)   ; if nil, bold is universally disabled
-    ;;   (doom-themes-enable-italic t) ; if nil, italics is universally disabled
-    ;;   :config
-    ;;   (load-theme 'roseprime t)
-    ;;   (doom-themes-visual-bell-config)
-    ;;   (doom-themes-neotree-config)
-    ;;   (doom-themes-treemacs-config)
-    ;;   (doom-themes-org-config))
-    ;; (add-to-list 'custom-theme-load-path "~/config/doom/themes/")
-    ;; (add-to-list 'load-path (concat user-emacs-directory "site-lisp"))
-    ;; (require 'kanagawa-themes)
-  (use-package kanagawa-themes
-    :ensure t
-    :config
-    (load-theme 'kanagawa-dragon t))
+      ;; (use-package kanagawa-themes
+      ;;   :ensure t
+      ;;   :config
+      ;;   (load-theme 'kanagawa-dragon t))
+    (use-package doom-themes
+      :ensure t
+      :config
+      ;; Global settings (defaults)
+      (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+            doom-themes-enable-italic t) ; if nil, italics is universally disabled
+      (load-theme 'doom-dracula t)
+
+      ;; Enable flashing mode-line on errors
+      (doom-themes-visual-bell-config)
+      ;; Enable custom neotree theme (all-the-icons must be installed!)
+      (doom-themes-neotree-config)
+      ;; or for treemacs users
+      (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+      (doom-themes-treemacs-config)
+      ;; Corrects (and improves) org-mode's native fontification.
+      (doom-themes-org-config))
+      ;; (load-theme 'modus-vivendi-deuteranopia)
+      ;; (custom-set-faces
+      ;; '(line-number ((t (:background "#181616"))))
+      ;; '(line-number-current-line ((t (:background "#181616"))))
+      ;; '(fringe ((t (:background "#181616")))))
+  #+end_src
+
+* Diminish
+#+begin_src emacs-lisp
+  (use-package diminish
+    :ensure t)
+
 #+end_src
 
 * ORG Mode
@@ -294,24 +371,30 @@ Table of Contents
 #+end_src
 
 ** Org Bullets
-
 #+begin_src emacs-lisp
   (add-hook 'org-mode-hook 'org-indent-mode)
-  (use-package org-bullets :ensure t)
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  (add-hook 'org-mode-hook #'org-modern-mode)
+  (use-package org-modern
+    :ensure t)
+  (setq
+   ;; Edit settings
+   org-auto-align-tags nil
+   org-tags-column 0
+   org-catch-invisible-edits 'show-and-error
+   org-special-ctrl-a/e t
+   org-insert-heading-respect-content t
+
+   ;; Org styling, hide markup etc.
+   org-hide-emphasis-markers t
+   org-pretty-entities t
+   org-agenda-tags-column 0
+   org-ellipsis "…")
 #+end_src
 
 ** Electric Indent
 #+begin_src emacs-lisp
   (electric-indent-mode -1)
   (electric-pair-mode 1)
-#+end_src
-
-* Diminish
-#+begin_src emacs-lisp
-  (use-package diminish
-    :ensure t)
-
 #+end_src
 
 * Code
@@ -333,8 +416,8 @@ Table of Contents
     :init
     (setq lsp-keymap-prefix "C-c l")
     :config
-    (lsp-enable-which-key-integration t))
-  ;; (setq lsp-completion-provider :none))
+    (lsp-enable-which-key-integration t)
+    (setq lsp-completion-provider :none))
 
   (add-hook 'c-mode-hook #'lsp-deferred)
   (add-hook 'c++-mode-hook #'lsp-deferred)
@@ -412,7 +495,7 @@ Table of Contents
     	      ([tab] . corfu-next)
     	      ([backtab] . corfu-previous)
     	      ("S-<return>" . corfu-insert))
-    
+
     :init
     (global-corfu-mode)
 
@@ -666,7 +749,8 @@ Table of Contents
     :ensure t
     :config
     (setq vterm-toggle-fullscreen-p nil
-  	vterm-toggle-scope 'project))
+    	vterm-toggle-scope 'project))
+  (global-set-key (kbd "C-x C-m") 'vterm-toggle)
 #+end_src
 
 #+begin_src emacs-lisp
@@ -684,22 +768,42 @@ Table of Contents
 * Magit
 #+begin_src emacs-lisp
 (elpaca (transient :fetcher github :repo "magit/transient"))
-(elpaca (magit-section :fetcher github :repo "magit/magit"
-                       :files ("lisp/magit-section.el")))
-  (use-package magit
-    :elpaca (magit :fetcher github :repo "magit/magit"
-                   :files ("lisp/magit.el" "lisp/magit*.el" "lisp/git-rebase.el" 
-                           "docs/magit.texi" "magit-pkg.el"))
-    :after transient
-    :ensure t
-    :defer t
-    :commands (magit-status magit-log magit-commit)
-    :config
-    (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+(use-package magit
+  :elpaca (magit :fetcher github :repo "magit/magit")
+  :after transient
+  :bind ("C-x g" . magit-status)
+  :config
+  (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 #+end_src
 
 #+begin_src emacs-lisp
   (setq native-comp-async-report-warnings-errors 'silent)
-  (setq warning-minimum-level :error) ;; Only show actual errors, not warnings
-  (setq ad-redefinition-action 'accept) ;; Silence warnings about function redefinitions
+  (setq warning-minimum-level :error)
+  (setq ad-redefinition-action 'accept)
+#+end_src
+
+
+* EXWM
+#+begin_src emacs-lisp
+  ;; (require 'exwm)
+#+end_src
+
+* Utils
+** Zen Mode
+#+begin_src emacs-lisp
+#+end_src
+** Tab line Mode
+#+begin_src emacs-lisp
+  ;; (global-tab-line-mode 1)
+  ;; (set-face-attribute 'tab-line-tab-current nil :inherit 'default :foreground "#c4746e" :background "#181616" :box '(:line-width (3 . 3) :style released-button))
+  (set-face-attribute 'tab-line-tab nil :inherit 'default :foreground "#c4746e" :background "#181616" :box '(:line-width (3 . 3) :style released-button))
+  (set-face-attribute 'tab-line-tab-inactive nil :inherit 'default :foreground "#8a9a7b" :background "#181616" :box '(:line-width (3 . 3) :style released-button))
+  (set-face-attribute 'tab-line-tab-modified nil :inherit nil :height 140 :weight 'bold :box nil)
+  (setq tab-line-new-button-show nil)
+#+end_src
+
+** Tab Bar Mode
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-c C-t") 'tab-bar-new-tab)
+  (global-set-key (kbd "C-c C-w") 'tab-bar-close-tab)
 #+end_src

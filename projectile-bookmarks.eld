@@ -1,1 +1,0 @@
-("~/.config/emacs/" "~/git/dotfiles/" "~/git/scripts/" "~/git/crabos/" "~/nixos/")
