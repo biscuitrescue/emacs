@@ -340,11 +340,7 @@ Elpaca
     (doom-themes-neotree-config)
     (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
     (doom-themes-treemacs-config)
-    (doom-themes-org-config)
-    (set-face-attribute 'line-number nil :background nil)
-    (set-face-attribute 'line-number-current-line nil :background nil)
-    (set-face-attribute 'fringe nil :background nil)
-    )
+    (doom-themes-org-config))
 #+end_src
 
 * Diminish
@@ -507,7 +503,9 @@ Table of Contents
                             corfu-quit-no-match t
                             corfu-auto nil)
                 (corfu-mode)))
-    (add-hook 'exwm-workspace-switch-hook #'corfu-quit)
+    (add-hook 'exwm-mode-hook
+              (lambda ()
+                (add-hook 'exwm-input--input-mode-change-hook #'corfu-quit nil t)))
     (add-hook 'exwm-mode-hook
               (lambda ()
                 (add-hook 'pre-command-hook #'corfu-quit nil t)))
@@ -837,6 +835,7 @@ Table of Contents
             ([?\s-j] . windmove-down)
             ([?\s-k] . windmove-up)
             ([?\s-d] . counsel-linux-app)
+  	  (,(kbd "s-<return>") . vterm)
             ([?\s-&] . (lambda (command)
                          (interactive (list (read-shell-command "$ ")))
                          (start-process-shell-command command nil command)))
@@ -898,10 +897,18 @@ Table of Contents
 
 * Line number setface
 #+begin_src emacs-lisp 
-(add-hook 'after-init-hook
-          (lambda ()
-            (let ((bg (face-attribute 'default :background)))
-              (set-face-attribute 'line-number nil :background bg)
-              (set-face-attribute 'line-number-current-line nil :background bg)
-              (set-face-attribute 'fringe nil :background bg))))
+  (add-hook 'after-init-hook
+            (lambda ()
+              (let ((bg (face-attribute 'default :background)))
+                (set-face-attribute 'line-number nil :background bg)
+                (set-face-attribute 'line-number-current-line nil :background bg)
+                (set-face-attribute 'fringe nil :background bg))))
+  (defun my/match-bg-faces (&rest _)
+    (let ((bg (face-attribute 'default :background)))
+      (set-face-attribute 'line-number nil :background bg)
+      (set-face-attribute 'line-number-current-line nil :background bg)
+      (set-face-attribute 'fringe nil :background bg)))
+
+  (add-hook 'after-init-hook #'my/match-bg-faces)
+  (add-hook 'enable-theme-functions #'my/match-bg-faces)
 #+end_src
