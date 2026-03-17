@@ -1,8 +1,9 @@
-#+TITLE: GNU Emacs Config
+ #+TITLE: GNU Emacs Config
 #+AUTHOR: biscuitrescue
 #+DESCRIPTION: Personal emacs config
 #+STARTUP: showeverything
 #+OPTIONS: toc:2
+#+PROPERTY: header-args:emacs-lisp :tangle ~/.emacs.d/config.el :mkdirp yes
 
 * TOC :toc:
 - [[#init-loading-programs][Init Loading programs]]
@@ -42,9 +43,12 @@
 - [[#magit][Magit]]
 - [[#exwm][EXWM]]
 - [[#utils][Utils]]
+  - [[#consult-line][consult line]]
   - [[#zen-mode][Zen Mode]]
   - [[#tab-line-mode][Tab line Mode]]
   - [[#tab-bar-mode][Tab Bar Mode]]
+- [[#auto-tangle][Auto Tangle]]
+- [[#line-number-setface][Line number setface]]
 
 * Init Loading programs
 
@@ -135,7 +139,7 @@ Elpaca
           which-key-sort-uppercase-first nil
           which-key-separator " → "
           which-key-allow-imprecise-window-fit t))
-#+end_src
+          #+end_src
 
 ** Navigation
 *** Ace
@@ -261,18 +265,17 @@ Elpaca
     :ensure t
     :init
     (setq initial-buffer-choice 'dashboard-open)
-    (setq dashboard-set-heading-icons t)
+    (setq dashboard-set-heading-icons nil)
     (setq dashboard-set-file-icons t)
     (setq dashboard-startup-banner 'logo)
-    ;; (setq dashboard-center-content t)
-    ;; (setq dashboard-vertically-center-content t)
+    (setq dashboard-center-content t)
+    (setq dashboard-vertically-center-content t)
     (setq dashboard-show-shortcuts nil)
-    ;; (setq dashboard-items '((recents   . 5)
-    ;;                         (bookmarks . 3)
-    ;;                         (projects  . 3)
-    ;;                         (agenda    . 5)
-    ;;                         (registers . 3)))
-
+    (setq dashboard-items nil)          ;; nil not empty list
+    (setq dashboard-display-icons-p nil)
+    (setq dashboard-set-navigator nil)
+    (setq dashboard-set-init-info nil)  ;; hides "X packages loaded in Xs"
+    (setq dashboard-set-footer nil)     ;; hides the footer quote
     (dashboard-setup-startup-hook))
   ;; (add-hook 'dashboard-setup-startup-hook (lambda () (display-line-numbers-mode -1)))
 #+end_src
@@ -299,10 +302,10 @@ Elpaca
 
 ** Popup menu
 #+begin_src emacs-lisp
-      (use-package ace-popup-menu
-        :ensure t
-        :config
-        (ace-popup-menu-mode 1))
+  (use-package ace-popup-menu
+    :ensure t
+    :config
+    (ace-popup-menu-mode 1))
 #+end_src
 ** Basic conf
 #+begin_src emacs-lisp
@@ -321,33 +324,28 @@ Elpaca
 #+end_src
 ** Theme
 #+begin_src emacs-lisp
-      ;; (use-package kanagawa-themes
-      ;;   :ensure t
-      ;;   :config
-      ;;   (load-theme 'kanagawa-dragon t))
-    (use-package doom-themes
-      :ensure t
-      :config
-      ;; Global settings (defaults)
-      (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-            doom-themes-enable-italic t) ; if nil, italics is universally disabled
-      (load-theme 'doom-dracula t)
+  ;; (use-package kanagawa-themes
+  ;;   :ensure t
+  ;;   :config
+  ;;   (load-theme 'kanagawa-dragon t))
+  (use-package doom-themes
+    :ensure t
+    :config
+    ;; Global settings (defaults)
+    (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+          doom-themes-enable-italic t) ; if nil, italics is universally disabled
+    (load-theme 'doom-one t)
 
-      ;; Enable flashing mode-line on errors
-      (doom-themes-visual-bell-config)
-      ;; Enable custom neotree theme (all-the-icons must be installed!)
-      (doom-themes-neotree-config)
-      ;; or for treemacs users
-      (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
-      (doom-themes-treemacs-config)
-      ;; Corrects (and improves) org-mode's native fontification.
-      (doom-themes-org-config))
-      ;; (load-theme 'modus-vivendi-deuteranopia)
-      ;; (custom-set-faces
-      ;; '(line-number ((t (:background "#181616"))))
-      ;; '(line-number-current-line ((t (:background "#181616"))))
-      ;; '(fringe ((t (:background "#181616")))))
-  #+end_src
+    (doom-themes-visual-bell-config)
+    (doom-themes-neotree-config)
+    (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
+    (doom-themes-treemacs-config)
+    (doom-themes-org-config)
+    (set-face-attribute 'line-number nil :background nil)
+    (set-face-attribute 'line-number-current-line nil :background nil)
+    (set-face-attribute 'fringe nil :background nil)
+    )
+#+end_src
 
 * Diminish
 #+begin_src emacs-lisp
@@ -359,7 +357,6 @@ Elpaca
 * ORG Mode
 ** TOC
 Table of Contents
-
 #+begin_src emacs-lisp
   (use-package toc-org
     :ensure t
@@ -471,14 +468,14 @@ Table of Contents
       :new-connection (lsp-stdio-connection "nil_ls")
       :major-modes '(nix-mode)
       :server-id 'nil-ls)))
-#+end_src
+  #+end_src
 
 *** Corfu
 #+begin_src emacs-lisp
   (use-package corfu
     :ensure t
     :custom
-    (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+    (corfu-cycle t)
     (corfu-auto t)
     (corfu-auto-prefix 2)
     (corfu-auto-delay 0.0)
@@ -486,30 +483,40 @@ Table of Contents
     (corfu-echo-documentation 0.25)
     (corfu-preview-current 'insert)
     (corfu-preselect-first nil)
-
     :bind (:map corfu-map
-    	      ("M-SPC" . corfu-insert-separator)
-    	      ("RET" . corfu-insert)
-    	      ("TAB" . corfu-next)
-    	      ("S-TAB" . corfu-previous)
-    	      ([tab] . corfu-next)
-    	      ([backtab] . corfu-previous)
-    	      ("S-<return>" . corfu-insert))
-
+                ("M-SPC" . corfu-insert-separator)
+                ("RET" . corfu-insert)
+                ("TAB" . corfu-next)
+                ("S-TAB" . corfu-previous)
+                ([tab] . corfu-next)
+                ([backtab] . corfu-previous)
+                ("S-<return>" . corfu-insert)
+                ("C-g" . corfu-quit))
     :init
     (global-corfu-mode)
-
     (corfu-history-mode)
     :config
+    (setq corfu-auto t
+          corfu-quit-no-match 'separator)
+    (setq x-gtk-use-system-tooltips nil)
+    (setq corfu-left-margin-width 0.0)
+    (setq corfu-right-margin-width 0.0)
     (add-hook 'eshell-mode-hook
-    	    (lambda () (setq-local corfu-quit-at-boundary t
-    				   corfu-quit-no-match t
-    				   corfu-auto nil)
-                (corfu-mode))))
-
-  ;; Enable auto completion and configure quitting
-  (setq corfu-auto t
-        corfu-quit-no-match 'separator) ;; or t
+              (lambda ()
+                (setq-local corfu-quit-at-boundary t
+                            corfu-quit-no-match t
+                            corfu-auto nil)
+                (corfu-mode)))
+    (add-hook 'exwm-workspace-switch-hook #'corfu-quit)
+    (add-hook 'exwm-mode-hook
+              (lambda ()
+                (add-hook 'pre-command-hook #'corfu-quit nil t)))
+    (advice-add #'corfu--make-frame :after
+                (lambda (&rest _)
+                  (when (frame-live-p corfu--frame)
+                    (set-frame-parameter corfu--frame 'parent-frame (selected-frame))
+                    (set-frame-parameter corfu--frame 'no-accept-focus t)
+                    (set-frame-parameter corfu--frame 'no-focus-on-map t)))))
 
 #+end_src
 *** Cape
@@ -554,6 +561,11 @@ Table of Contents
     (completion-category-overrides '((file (styles partial-completion))))
     (completion-category-defaults nil) ;; Disable defaults, use our settings
     (completion-pcm-leading-wildcard t)) ;; Emacs 31: partial-completion behaves like substring
+#+end_src
+*** Counsel
+#+begin_src emacs-lisp
+  (use-package counsel
+    :ensure t)
 #+end_src
 *** Consult
 #+begin_src emacs-lisp
@@ -767,13 +779,13 @@ Table of Contents
 
 * Magit
 #+begin_src emacs-lisp
-(elpaca (transient :fetcher github :repo "magit/transient"))
-(use-package magit
-  :elpaca (magit :fetcher github :repo "magit/magit")
-  :after transient
-  :bind ("C-x g" . magit-status)
-  :config
-  (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+  (elpaca (transient :fetcher github :repo "magit/transient"))
+  (use-package magit
+    :elpaca (magit :fetcher github :repo "magit/magit")
+    :after transient
+    :bind ("C-x g" . magit-status)
+    :config
+    (setq magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -785,10 +797,73 @@ Table of Contents
 
 * EXWM
 #+begin_src emacs-lisp
-  ;; (require 'exwm)
-#+end_src
+  (defun efs/exwm-update-class ()
+    (exwm-workspace-rename-buffer exwm-class-name))
+  (use-package exwm
+    :ensure t
+    :config
+    (setq exwm-workspace-number 5)
+    (add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
+    (require 'exwm-randr)
+    (setq exwm-randr-workspace-monitor-plist
+          '(0 "HDMI-1" 1 "HDMI-1" 2 "HDMI-1" 3 "eDP-1" 4 "eDP-1"))
+    (exwm-randr-mode)
+    (add-hook 'exwm-workspace-switch-hook
+              (lambda ()
+                (setq-local corfu-left-margin-width 0
+                            corfu-right-margin-width 0)))
+    (start-process-shell-command "xrandr" nil "xrandr --output eDP-1 --mode 1920x1080 --pos 0x0 --rotate normal --output HDMI-1 --primary --mode 2560x1440 --pos 1920x0 --rotate normal --output DP-1 --off")
+    (start-process-shell-command "feh" nil "./.fehbg")
+    (require 'exwm-systemtray)
+    (exwm-systemtray-mode)
+    (setq exwm-input-prefix-keys
+          `(?\C-x
+            ?\C-g
+            ?\C-u
+            ?\C-h
+            ?\M-x
+            ?\M-'
+            ?\M-&
+            ?\M-o
+            ?\M-;
+            ?\C-\M-j
+            ?\C-\ ))
+    (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
+    (setq exwm-input-global-keys
+          `(
+            ([?\s-r] . exwm-reset)
+            ([?\s-h] . windmove-left)
+            ([?\s-l] . windmove-right)
+            ([?\s-j] . windmove-down)
+            ([?\s-k] . windmove-up)
+            ([?\s-d] . counsel-linux-app)
+            ([?\s-&] . (lambda (command)
+                         (interactive (list (read-shell-command "$ ")))
+                         (start-process-shell-command command nil command)))
+            ([?\s-w] . exwm-workspace-switch)
+            ,@(mapcar (lambda (i)
+                        `(,(kbd (format "s-%d" i)) .
+                      	(lambda ()
+                      	  (interactive)
+                      	  (exwm-workspace-switch-create ,i))))
+                      (number-sequence 0 9))
+            ))
+    (exwm-wm-mode))
+  (set-frame-parameter (selected-frame) 'alpha-background 95)
+  (add-to-list 'default-frame-alist '(alpha-background . 95))
+  (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
+  (add-to-list 'default-frame-alist '(fullscreen . maximized))
+  (setq display-time-day-and-date t)
+  (display-time-mode 1)  
+  (display-battery-mode 1)
+
+          #+end_src
 
 * Utils
+** consult line
+#+begin_src emacs-lisp
+  (global-set-key (kbd "M-/") 'consult-line)
+#+end_src
 ** Zen Mode
 #+begin_src emacs-lisp
 #+end_src
@@ -796,14 +871,37 @@ Table of Contents
 #+begin_src emacs-lisp
   ;; (global-tab-line-mode 1)
   ;; (set-face-attribute 'tab-line-tab-current nil :inherit 'default :foreground "#c4746e" :background "#181616" :box '(:line-width (3 . 3) :style released-button))
-  (set-face-attribute 'tab-line-tab nil :inherit 'default :foreground "#c4746e" :background "#181616" :box '(:line-width (3 . 3) :style released-button))
-  (set-face-attribute 'tab-line-tab-inactive nil :inherit 'default :foreground "#8a9a7b" :background "#181616" :box '(:line-width (3 . 3) :style released-button))
-  (set-face-attribute 'tab-line-tab-modified nil :inherit nil :height 140 :weight 'bold :box nil)
-  (setq tab-line-new-button-show nil)
+  ;; (set-face-attribute 'tab-line-tab nil :inherit 'default :foreground "#c4746e" :background "#181616" :box '(:line-width (3 . 3) :style released-button))
+  ;; (set-face-attribute 'tab-line-tab-inactive nil :inherit 'default :foreground "#8a9a7b" :background "#181616" :box '(:line-width (3 . 3) :style released-button))
+  ;; (
+  ;;  set-face-attribute 'tab-line-tab-modified nil :inherit nil :height 140 :weight 'bold :box nil)
+  ;; (
+  ;; setq tab-line-new-button-show nil)
 #+end_src
 
 ** Tab Bar Mode
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-c C-t") 'tab-bar-new-tab)
   (global-set-key (kbd "C-c C-w") 'tab-bar-close-tab)
+
+#+end_src
+
+* Auto Tangle
+#+begin_src emacs-lisp
+  (defun efs/org-babel-tangle-config ()
+    (when (string-equal (buffer-file-name)
+  		      (expand-file-name "~/.emacs.d/config.org"))
+      (let ((org-confirm-babel-evaluate nil))
+        (org-babel-tangle))))
+  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
+#+end_src
+
+* Line number setface
+#+begin_src emacs-lisp 
+(add-hook 'after-init-hook
+          (lambda ()
+            (let ((bg (face-attribute 'default :background)))
+              (set-face-attribute 'line-number nil :background bg)
+              (set-face-attribute 'line-number-current-line nil :background bg)
+              (set-face-attribute 'fringe nil :background bg))))
 #+end_src
