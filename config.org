@@ -1,4 +1,4 @@
- #+TITLE: GNU Emacs Config
+#+TITLE: GNU Emacs Config
 #+AUTHOR: biscuitrescue
 #+DESCRIPTION: Personal emacs config
 #+STARTUP: showeverything
@@ -30,6 +30,7 @@
 - [[#org-mode][ORG Mode]]
   - [[#toc][TOC]]
   - [[#org-bullets][Org Bullets]]
+  - [[#org-roam][Org Roam]]
   - [[#electric-indent][Electric Indent]]
 - [[#code][Code]]
   - [[#flycheck][Flycheck]]
@@ -43,6 +44,7 @@
 - [[#magit][Magit]]
 - [[#exwm][EXWM]]
 - [[#utils][Utils]]
+  - [[#pdf][PDF]]
   - [[#consult-line][consult line]]
   - [[#zen-mode][Zen Mode]]
   - [[#tab-line-mode][Tab line Mode]]
@@ -207,7 +209,7 @@ Elpaca
     (setq resize-frame nil)
     (message "Done."))
 
-  (global-set-key (kbd "ESC `") 'resize-frame)
+  (global-set-key (kbd "C-`") 'resize-frame)
 
   (provide 'resize-frame)
 #+end_src
@@ -257,7 +259,32 @@ Elpaca
 #+begin_src emacs-lisp
   (use-package doom-modeline
     :ensure t
-    :init (doom-modeline-mode 1))
+    :init (doom-modeline-mode 1)
+    :config
+    (setq doom-modeline-workspace-name t)
+    (setq doom-modeline-buffer-file-name-style 'file-name)
+    (doom-modeline-def-segment my-exwm-workspace
+      (propertize (format " [%d] " exwm-workspace-current-index)
+    		'face 'doom-modeline-buffer-major-mode))
+    ;; (doom-modeline-def-segment my-exwm-workspace
+    ;;   (when (bound-and-true-p exwm-workspace-current-index)
+    ;;     (propertize (format " [%d] " exwm-workspace-current-index)
+    ;;                 'face 'doom-modeline-buffer-major-mode)))
+
+    (doom-modeline-def-modeline 'minimal
+      '(bar my-exwm-workspace window-number buffer-info)
+      '(time battery))
+
+    (doom-modeline-def-modeline 'full
+      '(bar my-exwm-workspace window-number matches buffer-info remote-host buffer-position parrot selection-info)
+      '(objed-state misc-info persp-name grip irc mu4e gnus github debug repl lsp minor-modes input-method indent-info buffer-encoding major-mode process vcs battery))
+
+    (defun my/modeline-set ()
+      (if (eq major-mode 'exwm-mode)
+          (doom-modeline-set-modeline 'minimal)
+        (doom-modeline-set-modeline 'full)))
+
+    (add-hook 'buffer-list-update-hook #'my/modeline-set))
 #+end_src
 ** Dashboard
 #+begin_src emacs-lisp
@@ -334,7 +361,7 @@ Elpaca
     ;; Global settings (defaults)
     (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
           doom-themes-enable-italic t) ; if nil, italics is universally disabled
-    (load-theme 'doom-one t)
+    (load-theme 'doom-ir-black t)
 
     (doom-themes-visual-bell-config)
     (doom-themes-neotree-config)
@@ -382,6 +409,26 @@ Table of Contents
    org-pretty-entities t
    org-agenda-tags-column 0
    org-ellipsis "…")
+#+end_src
+** Org Roam
+#+begin_src emacs-lisp
+  (use-package org-roam
+    :ensure t
+    :custom
+    (org-roam-directory (file-truename "~/lang/org/roam/"))
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+           ("C-c n f" . org-roam-node-find)
+           ("C-c n g" . org-roam-graph)
+           ("C-c n i" . org-roam-node-insert)
+           ("C-c n c" . org-roam-capture)
+           ;; Dailies
+           ("C-c n j" . org-roam-dailies-capture-today))
+    :config
+    ;; If you're using a vertical completion framework, you might want a more informative completion interface
+    (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+    (org-roam-db-autosync-mode)
+    ;; If using org-roam-protocol
+    (require 'org-roam-protocol))
 #+end_src
 
 ** Electric Indent
@@ -464,7 +511,7 @@ Table of Contents
       :new-connection (lsp-stdio-connection "nil_ls")
       :major-modes '(nix-mode)
       :server-id 'nil-ls)))
-  #+end_src
+#+end_src
 
 *** Corfu
 #+begin_src emacs-lisp
@@ -476,6 +523,7 @@ Table of Contents
     (corfu-auto-prefix 2)
     (corfu-auto-delay 0.0)
     (corfu-quit-at-boundary 'separator)
+    (corfu-quit-no-match 'separator)
     (corfu-echo-documentation 0.25)
     (corfu-preview-current 'insert)
     (corfu-preselect-first nil)
@@ -489,14 +537,13 @@ Table of Contents
                 ("S-<return>" . corfu-insert)
                 ("C-g" . corfu-quit))
     :init
+    ;; (setq tab-always-indent 'complete) ;; Make TAB actually trigger completion
     (global-corfu-mode)
     (corfu-history-mode)
     :config
-    (setq corfu-auto t
-          corfu-quit-no-match 'separator)
+    (setq-local completion-styles '(orderless basic))
+    (setq corfu-exclude-modes '(exwm-mode))
     (setq x-gtk-use-system-tooltips nil)
-    (setq corfu-left-margin-width 0.0)
-    (setq corfu-right-margin-width 0.0)
     (add-hook 'eshell-mode-hook
               (lambda ()
                 (setq-local corfu-quit-at-boundary t
@@ -506,16 +553,12 @@ Table of Contents
     (add-hook 'exwm-mode-hook
               (lambda ()
                 (add-hook 'exwm-input--input-mode-change-hook #'corfu-quit nil t)))
-    (add-hook 'exwm-mode-hook
-              (lambda ()
-                (add-hook 'pre-command-hook #'corfu-quit nil t)))
     (advice-add #'corfu--make-frame :after
                 (lambda (&rest _)
                   (when (frame-live-p corfu--frame)
-                    (set-frame-parameter corfu--frame 'parent-frame (selected-frame))
+                    (set-frame-parameter corfu--frame 'parent-frame nil)
                     (set-frame-parameter corfu--frame 'no-accept-focus t)
                     (set-frame-parameter corfu--frame 'no-focus-on-map t)))))
-
 #+end_src
 *** Cape
 #+begin_src emacs-lisp
@@ -548,7 +591,6 @@ Table of Contents
             (lambda ()
               (when (minibufferp)
                 (corfu-mode 1))))
-
 #+end_src
 *** Orderless
 #+begin_src emacs-lisp
@@ -758,7 +800,7 @@ Table of Contents
     :after vterm
     :ensure t
     :config
-    (setq vterm-toggle-fullscreen-p nil
+    (setq vterm-toggle-fullscren-p nil
     	vterm-toggle-scope 'project))
   (global-set-key (kbd "C-x C-m") 'vterm-toggle)
 #+end_src
@@ -810,10 +852,15 @@ Table of Contents
               (lambda ()
                 (setq-local corfu-left-margin-width 0
                             corfu-right-margin-width 0)))
+    
     (start-process-shell-command "xrandr" nil "xrandr --output eDP-1 --mode 1920x1080 --pos 0x0 --rotate normal --output HDMI-1 --primary --mode 2560x1440 --pos 1920x0 --rotate normal --output DP-1 --off")
     (start-process-shell-command "feh" nil "./.fehbg")
     (require 'exwm-systemtray)
     (exwm-systemtray-mode)
+    (setq exwm-workspace-warp-cursor t)
+    (setq mouse-autoselect-window t
+    	focus-follows-mouse t)
+
     (setq exwm-input-prefix-keys
           `(?\C-x
             ?\C-g
@@ -835,16 +882,34 @@ Table of Contents
             ([?\s-j] . windmove-down)
             ([?\s-k] . windmove-up)
             ([?\s-d] . counsel-linux-app)
-  	  (,(kbd "s-<return>") . vterm)
+            ([?\s-i] . exwm-input-release-keyboard)
+            ([?\s-g] . exwm-input-grab-keyboard)
+            ([?\s-f] . exwm-layout-toggle-fullscreen)
+        	  (,(kbd "s-<return>") . vterm)
+    	  (,(kbd "<XF86AudioRaiseVolume>") . (lambda ()
+  					       (interactive)
+  					       (start-process-shell-command "vol+" nil "dunster volume_up")))
+    	  (,(kbd "<XF86AudioLowerVolume>") . (lambda ()
+  					       (interactive)
+  					       (start-process-shell-command "vol-" nil "dunster volume_down")))
+    	  (,(kbd "<XF86AudioMute>") . (lambda ()
+  					(interactive)
+  					(start-process-shell-command "volmute" nil "dunster volume_mute")))
+    	  (,(kbd "<F4>") . (lambda ()
+  			     (interactive)
+  			     (start-process-shell-command "micmute" nil "mictoggle")))
+        	  (,(kbd "s--") . (lambda ()
+      			    (interactive)
+      			    (start-process-shell-command "i3lock" nil "bash ~/.lock.sh")))
             ([?\s-&] . (lambda (command)
                          (interactive (list (read-shell-command "$ ")))
                          (start-process-shell-command command nil command)))
             ([?\s-w] . exwm-workspace-switch)
             ,@(mapcar (lambda (i)
                         `(,(kbd (format "s-%d" i)) .
-                      	(lambda ()
-                      	  (interactive)
-                      	  (exwm-workspace-switch-create ,i))))
+                          (lambda ()
+                            (interactive)
+                            (exwm-workspace-switch-create ,i))))
                       (number-sequence 0 9))
             ))
     (exwm-wm-mode))
@@ -856,9 +921,18 @@ Table of Contents
   (display-time-mode 1)  
   (display-battery-mode 1)
 
-          #+end_src
+#+end_src
 
 * Utils
+** PDF
+#+begin_src emacs-lisp
+  (use-package pdf-tools
+    :ensure t
+    :config
+    (pdf-tools-install)
+    (setq-default pdf-view-display-size 'fit-page)
+    :mode ("\\.pdf\\'" . pdf-view-mode))
+#+end_src
 ** consult line
 #+begin_src emacs-lisp
   (global-set-key (kbd "M-/") 'consult-line)
