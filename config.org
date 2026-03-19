@@ -515,50 +515,73 @@ Table of Contents
 
 *** Corfu
 #+begin_src emacs-lisp
-  (use-package corfu
-    :ensure t
-    :custom
-    (corfu-cycle t)
-    (corfu-auto t)
-    (corfu-auto-prefix 2)
-    (corfu-auto-delay 0.0)
-    (corfu-quit-at-boundary 'separator)
-    (corfu-quit-no-match 'separator)
-    (corfu-echo-documentation 0.25)
-    (corfu-preview-current 'insert)
-    (corfu-preselect-first nil)
-    :bind (:map corfu-map
-                ("M-SPC" . corfu-insert-separator)
-                ("RET" . corfu-insert)
-                ("TAB" . corfu-next)
-                ("S-TAB" . corfu-previous)
-                ([tab] . corfu-next)
-                ([backtab] . corfu-previous)
-                ("S-<return>" . corfu-insert)
-                ("C-g" . corfu-quit))
-    :init
-    ;; (setq tab-always-indent 'complete) ;; Make TAB actually trigger completion
-    (global-corfu-mode)
-    (corfu-history-mode)
-    :config
-    (setq-local completion-styles '(orderless basic))
-    (setq corfu-exclude-modes '(exwm-mode))
-    (setq x-gtk-use-system-tooltips nil)
-    (add-hook 'eshell-mode-hook
-              (lambda ()
-                (setq-local corfu-quit-at-boundary t
-                            corfu-quit-no-match t
-                            corfu-auto nil)
-                (corfu-mode)))
-    (add-hook 'exwm-mode-hook
-              (lambda ()
-                (add-hook 'exwm-input--input-mode-change-hook #'corfu-quit nil t)))
-    (advice-add #'corfu--make-frame :after
-                (lambda (&rest _)
-                  (when (frame-live-p corfu--frame)
-                    (set-frame-parameter corfu--frame 'parent-frame nil)
-                    (set-frame-parameter corfu--frame 'no-accept-focus t)
-                    (set-frame-parameter corfu--frame 'no-focus-on-map t)))))
+(defun my/corfu-exwm-unparent-frame (&rest _)
+  (when (frame-live-p corfu--frame)
+    (set-frame-parameter corfu--frame 'parent-frame nil)
+    (set-frame-parameter corfu--frame 'override-redirect t)
+    (set-frame-parameter corfu--frame 'z-group 'above)
+    (set-frame-parameter corfu--frame 'no-accept-focus t)
+    (set-frame-parameter corfu--frame 'no-focus-on-map t)))
+
+(defun my/corfu-exwm-offset-frame (orig-fun frame x y width height)
+  "Offset the X and Y coordinates to make Corfu multi-monitor aware."
+  (let* ((current-frame (or frame (selected-frame)))
+         ;; THE FIX: Prevent the walking feedback loop!
+         ;; If EXWM accidentally focused the popup, fallback to the buffer's true frame
+         (main-frame (if (and (boundp 'corfu--frame) (eq current-frame corfu--frame))
+                         (or (window-frame (get-buffer-window (current-buffer)))
+                             (next-frame current-frame))
+                       current-frame))
+         (frame-pos (frame-position main-frame))
+         (frame-x (car frame-pos))
+         (frame-y (cdr frame-pos))
+         ;; Convert relative X/Y to absolute global X/Y
+         (new-x (+ frame-x x))
+         (new-y (+ frame-y y)))
+    (funcall orig-fun frame new-x new-y width height)))
+
+(use-package corfu
+  :ensure t
+  :custom
+  (corfu-cycle t)
+  (corfu-auto t)
+  (corfu-auto-prefix 2)
+  (corfu-auto-delay 0.0)
+  (corfu-quit-at-boundary 'separator)
+  (corfu-quit-no-match 'separator)
+  (corfu-echo-documentation 0.25)
+  (corfu-preview-current 'insert)
+  (corfu-preselect-first nil)
+  :bind (:map corfu-map
+              ("M-SPC" . corfu-insert-separator)
+              ("RET" . corfu-insert)
+              ("TAB" . corfu-next)
+              ("S-TAB" . corfu-previous)
+              ([tab] . corfu-next)
+              ([backtab] . corfu-previous)
+              ("S-<return>" . corfu-insert)
+              ("C-g" . corfu-quit))
+  :init
+  (global-corfu-mode)
+  (corfu-history-mode)
+  :config
+  (setq-local completion-styles '(orderless basic))
+  (setq corfu-exclude-modes '(exwm-mode))
+  (setq x-gtk-use-system-tooltips nil)
+  
+  (add-hook 'eshell-mode-hook
+            (lambda ()
+              (setq-local corfu-quit-at-boundary t
+                          corfu-quit-no-match t
+                          corfu-auto nil)
+              (corfu-mode)))
+              
+  (add-hook 'exwm-mode-hook
+            (lambda ()
+              (add-hook 'exwm-input--input-mode-change-hook #'corfu-quit nil t)))
+              
+  (advice-add #'corfu--make-frame :after #'my/corfu-exwm-unparent-frame)
+  (advice-add #'corfu--make-frame :around #'my/corfu-exwm-offset-frame))
 #+end_src
 *** Cape
 #+begin_src emacs-lisp
@@ -913,8 +936,8 @@ Table of Contents
                       (number-sequence 0 9))
             ))
     (exwm-wm-mode))
-  (set-frame-parameter (selected-frame) 'alpha-background 95)
-  (add-to-list 'default-frame-alist '(alpha-background . 95))
+  (set-frame-parameter (selected-frame) 'alpha-background 90)
+  (add-to-list 'default-frame-alist '(alpha-background . 90))
   (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
   (add-to-list 'default-frame-alist '(fullscreen . maximized))
   (setq display-time-day-and-date t)
