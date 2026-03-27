@@ -13,7 +13,8 @@
   - [[#basic-binds][Basic Binds]]
   - [[#which-key][Which-Key]]
   - [[#navigation][Navigation]]
-  - [[#hydra][Hydra]]
+  - [[#resizing][Resizing]]
+  - [[#meow][Meow]]
 - [[#fonts][Fonts]]
   - [[#font-face][Font face]]
   - [[#zooming-inout][Zooming In/Out]]
@@ -42,15 +43,17 @@
   - [[#vterm][Vterm]]
   - [[#vterm-toggle][Vterm Toggle]]
 - [[#magit][Magit]]
-- [[#exwm][EXWM]]
 - [[#utils][Utils]]
   - [[#pdf][PDF]]
   - [[#consult-line][consult line]]
-  - [[#zen-mode][Zen Mode]]
-  - [[#tab-line-mode][Tab line Mode]]
   - [[#tab-bar-mode][Tab Bar Mode]]
-- [[#auto-tangle][Auto Tangle]]
-- [[#line-number-setface][Line number setface]]
+  - [[#auto-tangle][Auto Tangle]]
+  - [[#line-number-setface][Line number setface]]
+  - [[#comments][Comments]]
+  - [[#eshell][Eshell]]
+  - [[#ansi][ANSI]]
+  - [[#smooth-scroll][Smooth Scroll]]
+- [[#gcmh][GCMH]]
 
 * Init Loading programs
 
@@ -85,7 +88,8 @@ Elpaca
                     (emacs (concat invocation-directory invocation-name))
                     ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
                                           "--eval" "(byte-recompile-directory \".\" 0 'force)")))
-                    ((require 'elpaca))
+
+((require 'elpaca))
                     ((elpaca-generate-autoloads "elpaca" repo)))
               (progn (message "%s" (buffer-string)) (kill-buffer buffer))
             (error "%s" (with-current-buffer buffer (buffer-string))))
@@ -123,7 +127,7 @@ Elpaca
 * Keybinds
 ** Basic Binds
 #+begin_src emacs-lisp
-  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+  (global-set-key (kbd "<escape>") 'keyboard-quit)
 #+end_src
 ** Which-Key
 #+begin_src emacs-lisp
@@ -141,7 +145,7 @@ Elpaca
           which-key-sort-uppercase-first nil
           which-key-separator " → "
           which-key-allow-imprecise-window-fit t))
-          #+end_src
+#+end_src
 
 ** Navigation
 *** Ace
@@ -155,7 +159,7 @@ Elpaca
     :bind ("M-o" . ace-window))
 #+end_src
 
-** Hydra
+** Resizing
 #+begin_src emacs-lisp
   ;; (use-package hydra
   ;;   :ensure t
@@ -196,7 +200,7 @@ Elpaca
     :init-value nil
     ;; The indicator for the mode line.
     :lighter " ResizeFrame"
-    ;; The minor mode bindings.
+n    ;; The minor mode bindings.
     :keymap resize-frame-map
     :global t
     (if (<= (length (window-list)) 1)
@@ -214,21 +218,114 @@ Elpaca
   (provide 'resize-frame)
 #+end_src
 
+** Meow
+#+begin_src emacs-lisp 
+  (defun meow-setup ()
+    (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+    (meow-motion-define-key
+     '("j" . meow-next)
+     '("k" . meow-prev)
+     '("<escape>" . ignore))
+    (meow-leader-define-key
+     ;; Use SPC (0-9) for digit arguments.
+     '("1" . meow-digit-argument)
+     '("2" . meow-digit-argument)
+     '("3" . meow-digit-argument)
+     '("4" . meow-digit-argument)
+     '("5" . meow-digit-argument)
+     '("6" . meow-digit-argument)
+     '("7" . meow-digit-argument)
+     '("8" . meow-digit-argument)
+     '("9" . meow-digit-argument)
+     '("0" . meow-digit-argument)
+     '("/" . meow-keypad-describe-key)
+     '("." . find-file)
+     '("?" . meow-cheatsheet))
+    (meow-normal-define-key
+     '("0" . meow-expand-0)
+     '("9" . meow-expand-9)
+     '("8" . meow-expand-8)
+     '("7" . meow-expand-7)
+     '("6" . meow-expand-6)
+     '("5" . meow-expand-5)
+     '("4" . meow-expand-4)
+     '("3" . meow-expand-3)
+     '("2" . meow-expand-2)
+     '("1" . meow-expand-1)
+     '("-" . negative-argument)
+     '(";" . meow-reverse)
+     '("," . meow-inner-of-thing)
+     '("." . meow-bounds-of-thing)
+     '("[" . meow-beginning-of-thing)
+     '("]" . meow-end-of-thing)
+     '("a" . meow-append)
+     '("A" . meow-open-below)
+     '("b" . meow-back-word)
+     '("B" . meow-back-symbol)
+     '("c" . meow-change)
+     '("d" . meow-delete)
+     '("D" . meow-backward-delete)
+     '("e" . meow-next-word)
+     '("E" . meow-next-symbol)
+     '("f" . meow-find)
+     '("g" . meow-cancel-selection)
+     '("G" . meow-grab)
+     '("h" . meow-left)
+     '("H" . meow-left-expand)
+     '("i" . meow-insert)
+     '("I" . meow-open-above)
+     '("j" . meow-next)
+     '("J" . meow-next-expand)
+     '("k" . meow-prev)
+     '("K" . meow-prev-expand)
+     '("l" . meow-right)
+     '("L" . meow-right-expand)
+     '("m" . meow-join)
+     '("n" . meow-search)
+     '("o" . meow-block)
+     '("O" . meow-to-block)
+     '("p" . meow-yank)
+     '("q" . meow-quit)
+     '("Q" . meow-goto-line)
+     '("r" . meow-replace)
+     '("R" . meow-swap-grab)
+     '("s" . meow-kill)
+     '("t" . meow-till)
+     '("u" . meow-undo)
+     '("U" . meow-undo-in-selection)
+     '("v" . meow-visit)
+     '("w" . meow-mark-word)
+     '("W" . meow-mark-symbol)
+     '("x" . meow-line)
+     '("X" . meow-goto-line)
+     '("y" . meow-save)
+     '("Y" . meow-sync-grab)
+     '("z" . meow-pop-selection)
+     '("'" . repeat)
+     '("/" . consult-line)
+     '("<escape>" . ignore)))
+
+  (use-package meow
+    :ensure t
+    :config
+    (meow-setup)
+    (meow-global-mode 1))
+#+end_src
 * Fonts
 ** Font face
 #+begin_src emacs-lisp
 
   (set-face-attribute 'default nil
      		    :font "mononoki nerd font"
-     		    :height 150
+     		    :height 140
      		    :weight 'medium)
   (set-face-attribute 'variable-pitch nil
      		    :font "Monaspace Argon NF"
-     		    :height 170
+     		    :height 160
      		    :weight 'medium)
   (set-face-attribute 'fixed-pitch nil
      		    :font "Monaspace Argon NF"
-     		    :height 170;
+     		    :height 160
      		    :weight 'medium)
   (set-face-attribute 'font-lock-comment-face nil
      		    :slant 'italic)
@@ -262,29 +359,7 @@ Elpaca
     :init (doom-modeline-mode 1)
     :config
     (setq doom-modeline-workspace-name t)
-    (setq doom-modeline-buffer-file-name-style 'file-name)
-    (doom-modeline-def-segment my-exwm-workspace
-      (propertize (format " [%d] " exwm-workspace-current-index)
-    		'face 'doom-modeline-buffer-major-mode))
-    ;; (doom-modeline-def-segment my-exwm-workspace
-    ;;   (when (bound-and-true-p exwm-workspace-current-index)
-    ;;     (propertize (format " [%d] " exwm-workspace-current-index)
-    ;;                 'face 'doom-modeline-buffer-major-mode)))
-
-    (doom-modeline-def-modeline 'minimal
-      '(bar my-exwm-workspace window-number buffer-info)
-      '(time battery))
-
-    (doom-modeline-def-modeline 'full
-      '(bar my-exwm-workspace window-number matches buffer-info remote-host buffer-position parrot selection-info)
-      '(objed-state misc-info persp-name grip irc mu4e gnus github debug repl lsp minor-modes input-method indent-info buffer-encoding major-mode process vcs battery))
-
-    (defun my/modeline-set ()
-      (if (eq major-mode 'exwm-mode)
-          (doom-modeline-set-modeline 'minimal)
-        (doom-modeline-set-modeline 'full)))
-
-    (add-hook 'buffer-list-update-hook #'my/modeline-set))
+    (setq doom-modeline-buffer-file-name-style 'file-name))
 #+end_src
 ** Dashboard
 #+begin_src emacs-lisp
@@ -304,7 +379,7 @@ Elpaca
     (setq dashboard-set-init-info nil)  ;; hides "X packages loaded in Xs"
     (setq dashboard-set-footer nil)     ;; hides the footer quote
     (dashboard-setup-startup-hook))
-  ;; (add-hook 'dashboard-setup-startup-hook (lambda () (display-line-numbers-mode -1)))
+
 #+end_src
 
 ** Disable menubar, toolbar, scrollbar
@@ -336,45 +411,34 @@ Elpaca
 #+end_src
 ** Basic conf
 #+begin_src emacs-lisp
-  (setq scroll-margin 4)
+;;  (setq scroll-margin 4)
   (indent-tabs-mode 1)
   (add-hook 'org-mode-hook (lambda () (setq tab-width 8)))
-  (setq scroll-step 1
-        scroll-conservatively 10000)
+  ;;(setq scroll-step 1 scroll-conservatively 10000)
   ;;  (setq-default mode-line-format " %* %b %l:%C %*")
 #+end_src
 ** Line Numbers
 #+begin_src emacs-lisp
-  (setq display-line-numbers-type 'relative)
+  (setq display-line-numbers-type t)
   (global-display-line-numbers-mode 1)
   (global-visual-line-mode t)
 #+end_src
 ** Theme
 #+begin_src emacs-lisp
-  ;; (use-package kanagawa-themes
-  ;;   :ensure t
-  ;;   :config
-  ;;   (load-theme 'kanagawa-dragon t))
-  (use-package doom-themes
+  (use-package alabaster-themes
+    :ensure t
+    :config)
+  ;; (load-theme 'alabaster-themes-dark t))
+  (use-package ef-themes
     :ensure t
     :config
-    ;; Global settings (defaults)
-    (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-          doom-themes-enable-italic t) ; if nil, italics is universally disabled
-    (load-theme 'doom-ir-black t)
-
-    (doom-themes-visual-bell-config)
-    (doom-themes-neotree-config)
-    (setq doom-themes-treemacs-theme "doom-atom") ; use "doom-colors" for less minimal icon theme
-    (doom-themes-treemacs-config)
-    (doom-themes-org-config))
+    (load-theme 'ef-dark t))
 #+end_src
 
 * Diminish
 #+begin_src emacs-lisp
   (use-package diminish
     :ensure t)
-
 #+end_src
 
 * ORG Mode
@@ -515,73 +579,42 @@ Table of Contents
 
 *** Corfu
 #+begin_src emacs-lisp
-(defun my/corfu-exwm-unparent-frame (&rest _)
-  (when (frame-live-p corfu--frame)
-    (set-frame-parameter corfu--frame 'parent-frame nil)
-    (set-frame-parameter corfu--frame 'override-redirect t)
-    (set-frame-parameter corfu--frame 'z-group 'above)
-    (set-frame-parameter corfu--frame 'no-accept-focus t)
-    (set-frame-parameter corfu--frame 'no-focus-on-map t)))
+  (use-package corfu
+    :ensure t
+    :custom
+    (corfu-cycle t)
+    (corfu-auto t)
+    (corfu-auto-prefix 2)
+    (corfu-auto-delay 0.0)
+    (corfu-quit-at-boundary 'separator)
+    (corfu-quit-no-match 'separator)
+    (corfu-echo-documentation 0.25)
+    (corfu-preview-current 'insert)
+    (corfu-preselect-first nil)
+    :bind (:map corfu-map
+                ("M-SPC" . corfu-insert-separator)
+                ("RET" . corfu-insert)
+                ("TAB" . corfu-next)
+                ("S-TAB" . corfu-previous)
+                ([tab] . corfu-next)
+                ([backtab] . corfu-previous)
+                ("S-<return>" . corfu-insert)
+                ("C-g" . corfu-quit))
+    :init
+    (global-corfu-mode)
+    (corfu-history-mode)
+    :config
+    (setq-local completion-styles '(orderless basic))
+    (setq corfu-exclude-modes '(exwm-mode))
+    (setq x-gtk-use-system-tooltips nil)
+    
+    (add-hook 'eshell-mode-hook
+              (lambda ()
+                (setq-local corfu-quit-at-boundary t
+                            corfu-quit-no-match t
+                            corfu-auto nil)
+                (corfu-mode))))
 
-(defun my/corfu-exwm-offset-frame (orig-fun frame x y width height)
-  "Offset the X and Y coordinates to make Corfu multi-monitor aware."
-  (let* ((current-frame (or frame (selected-frame)))
-         ;; THE FIX: Prevent the walking feedback loop!
-         ;; If EXWM accidentally focused the popup, fallback to the buffer's true frame
-         (main-frame (if (and (boundp 'corfu--frame) (eq current-frame corfu--frame))
-                         (or (window-frame (get-buffer-window (current-buffer)))
-                             (next-frame current-frame))
-                       current-frame))
-         (frame-pos (frame-position main-frame))
-         (frame-x (car frame-pos))
-         (frame-y (cdr frame-pos))
-         ;; Convert relative X/Y to absolute global X/Y
-         (new-x (+ frame-x x))
-         (new-y (+ frame-y y)))
-    (funcall orig-fun frame new-x new-y width height)))
-
-(use-package corfu
-  :ensure t
-  :custom
-  (corfu-cycle t)
-  (corfu-auto t)
-  (corfu-auto-prefix 2)
-  (corfu-auto-delay 0.0)
-  (corfu-quit-at-boundary 'separator)
-  (corfu-quit-no-match 'separator)
-  (corfu-echo-documentation 0.25)
-  (corfu-preview-current 'insert)
-  (corfu-preselect-first nil)
-  :bind (:map corfu-map
-              ("M-SPC" . corfu-insert-separator)
-              ("RET" . corfu-insert)
-              ("TAB" . corfu-next)
-              ("S-TAB" . corfu-previous)
-              ([tab] . corfu-next)
-              ([backtab] . corfu-previous)
-              ("S-<return>" . corfu-insert)
-              ("C-g" . corfu-quit))
-  :init
-  (global-corfu-mode)
-  (corfu-history-mode)
-  :config
-  (setq-local completion-styles '(orderless basic))
-  (setq corfu-exclude-modes '(exwm-mode))
-  (setq x-gtk-use-system-tooltips nil)
-  
-  (add-hook 'eshell-mode-hook
-            (lambda ()
-              (setq-local corfu-quit-at-boundary t
-                          corfu-quit-no-match t
-                          corfu-auto nil)
-              (corfu-mode)))
-              
-  (add-hook 'exwm-mode-hook
-            (lambda ()
-              (add-hook 'exwm-input--input-mode-change-hook #'corfu-quit nil t)))
-              
-  (advice-add #'corfu--make-frame :after #'my/corfu-exwm-unparent-frame)
-  (advice-add #'corfu--make-frame :around #'my/corfu-exwm-offset-frame))
 #+end_src
 *** Cape
 #+begin_src emacs-lisp
@@ -783,14 +816,6 @@ Table of Contents
 
 * Perspective
 #+begin_src emacs-lisp
-  ;; (use-package perspective
-  ;;   :ensure t
-  ;;   :bind
-  ;;   ("C-x C-b" . persp-list-buffers)         ; or use a nicer switcher, see below
-  ;;   :custom
-  ;;   (persp-mode-prefix-key (kbd "C-c M-p"))  ; pick your own prefix key here
-  ;;   :init
-  ;; (persp-mode 1))
   (use-package perspective
     :ensure t
     :demand t
@@ -812,10 +837,52 @@ Table of Contents
 * Term
 ** Vterm
 #+begin_src emacs-lisp
+  (defun my/set-term-colors ()
+    (set-face-foreground 'term-color-black "#0E1415")
+    (set-face-foreground 'term-color-red "#DFDF8E")
+    (set-face-foreground 'term-color-green "#95CB82")
+    (set-face-foreground 'term-color-yellow "#CD974B")
+    (set-face-foreground 'term-color-blue "#8AB1F0")
+    (set-face-foreground 'term-color-magenta "#CC8BC9")
+    (set-face-foreground 'term-color-cyan "#8AB1F0")
+    (set-face-foreground 'term-color-white "#CECECE")
+
+    (set-face-foreground 'term-color-bright-black "#666666")
+    (set-face-foreground 'term-color-bright-red "#DFDF8E")
+    (set-face-foreground 'term-color-bright-green "#95CB82")
+    (set-face-foreground 'term-color-bright-yellow "#CD974B")
+    (set-face-foreground 'term-color-bright-blue "#8AB1F0")
+    (set-face-foreground 'term-color-bright-magenta "#CC8BC9")
+    (set-face-foreground 'term-color-bright-cyan "#8AB1F0")
+    (set-face-foreground 'term-color-bright-white "#FFFFFF"))
+
   (use-package vterm
-    :ensure t)
-  (setq shell-file-name "/bin/fish"
-        vterm-max-scrollback 5000)
+    :ensure t
+    :config
+    (setq vterm-max-scrollback 10000
+          vterm-color-default "#CECECE"
+          vterm-color-black   "#0E1415"
+          vterm-color-red     "#DFDF8E"
+          vterm-color-green   "#95CB82"
+          vterm-color-yellow  "#CD974B"
+          vterm-color-blue    "#8AB1F0"
+          vterm-color-magenta "#CC8BC9"
+          vterm-color-cyan    "#8AB1F0"
+          vterm-color-white   "#CECECE"
+          vterm-color-bright-black   "#666666"
+          vterm-color-bright-red     "#DFDF8E"
+          vterm-color-bright-green   "#95CB82"
+          vterm-color-bright-yellow  "#CD974B"
+          vterm-color-bright-blue    "#8AB1F0"
+          vterm-color-bright-magenta "#CC8BC9"
+          vterm-color-bright-cyan    "#8AB1F0"
+          vterm-color-bright-white   "#FFFFFF")
+
+    (my/set-term-colors)
+    (add-hook 'vterm-mode-hook #'my/set-term-colors)
+    (advice-add 'load-theme :after
+                (lambda (&rest _) (my/set-term-colors))))
+  (setq shell-file-name "/bin/fish")
 #+end_src
 ** Vterm Toggle
 #+begin_src emacs-lisp
@@ -823,9 +890,10 @@ Table of Contents
     :after vterm
     :ensure t
     :config
-    (setq vterm-toggle-fullscren-p nil
-    	vterm-toggle-scope 'project))
+    (setq vterm-toggle-fullscreen-p nil
+      	vterm-toggle-scope 'project))
   (global-set-key (kbd "C-x C-m") 'vterm-toggle)
+
 #+end_src
 
 #+begin_src emacs-lisp
@@ -857,95 +925,6 @@ Table of Contents
   (setq ad-redefinition-action 'accept)
 #+end_src
 
-
-* EXWM
-#+begin_src emacs-lisp
-  (defun efs/exwm-update-class ()
-    (exwm-workspace-rename-buffer exwm-class-name))
-  (use-package exwm
-    :ensure t
-    :config
-    (setq exwm-workspace-number 5)
-    (add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
-    (require 'exwm-randr)
-    (setq exwm-randr-workspace-monitor-plist
-          '(0 "HDMI-1" 1 "HDMI-1" 2 "HDMI-1" 3 "eDP-1" 4 "eDP-1"))
-    (exwm-randr-mode)
-    (add-hook 'exwm-workspace-switch-hook
-              (lambda ()
-                (setq-local corfu-left-margin-width 0
-                            corfu-right-margin-width 0)))
-    
-    (start-process-shell-command "xrandr" nil "xrandr --output eDP-1 --mode 1920x1080 --pos 0x0 --rotate normal --output HDMI-1 --primary --mode 2560x1440 --pos 1920x0 --rotate normal --output DP-1 --off")
-    (start-process-shell-command "feh" nil "./.fehbg")
-    (require 'exwm-systemtray)
-    (exwm-systemtray-mode)
-    (setq exwm-workspace-warp-cursor t)
-    (setq mouse-autoselect-window t
-    	focus-follows-mouse t)
-
-    (setq exwm-input-prefix-keys
-          `(?\C-x
-            ?\C-g
-            ?\C-u
-            ?\C-h
-            ?\M-x
-            ?\M-'
-            ?\M-&
-            ?\M-o
-            ?\M-;
-            ?\C-\M-j
-            ?\C-\ ))
-    (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
-    (setq exwm-input-global-keys
-          `(
-            ([?\s-r] . exwm-reset)
-            ([?\s-h] . windmove-left)
-            ([?\s-l] . windmove-right)
-            ([?\s-j] . windmove-down)
-            ([?\s-k] . windmove-up)
-            ([?\s-d] . counsel-linux-app)
-            ([?\s-i] . exwm-input-release-keyboard)
-            ([?\s-g] . exwm-input-grab-keyboard)
-            ([?\s-f] . exwm-layout-toggle-fullscreen)
-        	  (,(kbd "s-<return>") . vterm)
-    	  (,(kbd "<XF86AudioRaiseVolume>") . (lambda ()
-  					       (interactive)
-  					       (start-process-shell-command "vol+" nil "dunster volume_up")))
-    	  (,(kbd "<XF86AudioLowerVolume>") . (lambda ()
-  					       (interactive)
-  					       (start-process-shell-command "vol-" nil "dunster volume_down")))
-    	  (,(kbd "<XF86AudioMute>") . (lambda ()
-  					(interactive)
-  					(start-process-shell-command "volmute" nil "dunster volume_mute")))
-    	  (,(kbd "<F4>") . (lambda ()
-  			     (interactive)
-  			     (start-process-shell-command "micmute" nil "mictoggle")))
-        	  (,(kbd "s--") . (lambda ()
-      			    (interactive)
-      			    (start-process-shell-command "i3lock" nil "bash ~/.lock.sh")))
-            ([?\s-&] . (lambda (command)
-                         (interactive (list (read-shell-command "$ ")))
-                         (start-process-shell-command command nil command)))
-            ([?\s-w] . exwm-workspace-switch)
-            ,@(mapcar (lambda (i)
-                        `(,(kbd (format "s-%d" i)) .
-                          (lambda ()
-                            (interactive)
-                            (exwm-workspace-switch-create ,i))))
-                      (number-sequence 0 9))
-            ))
-    (exwm-wm-mode))
-  (set-frame-parameter (selected-frame) 'alpha-background 90)
-  (add-to-list 'default-frame-alist '(alpha-background . 90))
-  (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
-  (add-to-list 'default-frame-alist '(fullscreen . maximized))
-  (setq display-time-day-and-date t)
-  (display-time-mode 1)  
-  (display-battery-mode 1)
-
-#+end_src
-
 * Utils
 ** PDF
 #+begin_src emacs-lisp
@@ -960,29 +939,13 @@ Table of Contents
 #+begin_src emacs-lisp
   (global-set-key (kbd "M-/") 'consult-line)
 #+end_src
-** Zen Mode
-#+begin_src emacs-lisp
-#+end_src
-** Tab line Mode
-#+begin_src emacs-lisp
-  ;; (global-tab-line-mode 1)
-  ;; (set-face-attribute 'tab-line-tab-current nil :inherit 'default :foreground "#c4746e" :background "#181616" :box '(:line-width (3 . 3) :style released-button))
-  ;; (set-face-attribute 'tab-line-tab nil :inherit 'default :foreground "#c4746e" :background "#181616" :box '(:line-width (3 . 3) :style released-button))
-  ;; (set-face-attribute 'tab-line-tab-inactive nil :inherit 'default :foreground "#8a9a7b" :background "#181616" :box '(:line-width (3 . 3) :style released-button))
-  ;; (
-  ;;  set-face-attribute 'tab-line-tab-modified nil :inherit nil :height 140 :weight 'bold :box nil)
-  ;; (
-  ;; setq tab-line-new-button-show nil)
-#+end_src
-
 ** Tab Bar Mode
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-c C-t") 'tab-bar-new-tab)
   (global-set-key (kbd "C-c C-w") 'tab-bar-close-tab)
-
 #+end_src
 
-* Auto Tangle
+** Auto Tangle
 #+begin_src emacs-lisp
   (defun efs/org-babel-tangle-config ()
     (when (string-equal (buffer-file-name)
@@ -992,7 +955,7 @@ Table of Contents
   (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
 #+end_src
 
-* Line number setface
+** Line number setface
 #+begin_src emacs-lisp 
   (add-hook 'after-init-hook
             (lambda ()
@@ -1008,4 +971,76 @@ Table of Contents
 
   (add-hook 'after-init-hook #'my/match-bg-faces)
   (add-hook 'enable-theme-functions #'my/match-bg-faces)
+#+end_src
+
+** Comments
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-M-]") 'comment-line)
+#+end_src
+
+** Eshell
+
+#+begin_src emacs-lisp
+  (use-package eshell
+    :ensure nil
+    :hook (eshell-first-time-mode . my/eshell-setup)
+    :config
+    (defun my/eshell-setup ()
+      (setq eshell-history-size 5000
+            eshell-scroll-to-bottom-on-input t
+            eshell-scroll-to-bottom-on-output t
+            eshell-scroll-show-maximum-output t
+            eshell-buffer-maximum-lines 10000
+            eshell-hist-ignoredups t
+            eshell-highlight-prompt t
+            eshell-prompt-regexp "^[^#$\n]*[#$] ")))
+
+  (defun my/eshell-clear ()
+    (interactive)
+    (let ((inhibit-read-only t))
+      (erase-buffer)
+      (eshell-send-input)))
+
+  (with-eval-after-load 'esh-mode
+    (define-key eshell-mode-map (kbd "C-l") #'my/eshell-clear))
+
+  (setq eshell-prompt-function
+        (lambda ()
+          (concat
+           (abbreviate-file-name (eshell/pwd))
+           (if (= (user-uid) 0) " # " " $ "))))
+
+  (setq eshell-prompt-regexp ".* [#$] ")
+  (global-set-key (kbd "C-c e") 'eshell)
+#+end_src
+
+** ANSI
+#+begin_src emacs-lisp
+(require 'ansi-color)
+(defun my/ansi-colorize-compilation-buffer ()
+(let ((inhibit-read-only t))
+(ansi-color-apply-on-region (point-min) (point-max))))
+
+(add-hook 'compilation-filter-hook 'my/ansi-colorize-compilation-buffer)
+#+end_src>
+
+** Smooth Scroll
+#+begin_src emacs-lisp
+  (use-package ultra-scroll
+    :ensure t
+    :vc (:url "https://github.com/jdtsmith/ultra-scroll")
+    :init
+    (setq scroll-conservatively 3
+  	scroll-margin 0)      
+    :config
+    (ultra-scroll-mode 1))
+#+end_src
+
+* GCMH
+#+begin_src emacs-lisp
+(use-package gcmh
+  :ensure t
+  :demand t
+  :config
+  (gcmh-mode 1))
 #+end_src
