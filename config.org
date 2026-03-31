@@ -27,6 +27,7 @@
   - [[#basic-conf][Basic conf]]
   - [[#line-numbers][Line Numbers]]
   - [[#theme][Theme]]
+  - [[#transparency][Transparency]]
 - [[#diminish][Diminish]]
 - [[#org-mode][ORG Mode]]
   - [[#toc][TOC]]
@@ -316,13 +317,13 @@ n    ;; The minor mode bindings.
 #+begin_src emacs-lisp
 
   (set-face-attribute 'default nil
-     		    :font "mononoki nerd font"
+     		    :font "Monaspace Krypton Frozen"
      		    :height 140
-     		    :weight 'medium)
+     		    :weight 'regular)
   (set-face-attribute 'variable-pitch nil
-     		    :font "Monaspace Argon NF"
+     		    :font "Monaspace Krypton Var"
      		    :height 160
-     		    :weight 'medium)
+     		    :weight 'regular)
   (set-face-attribute 'fixed-pitch nil
      		    :font "Monaspace Argon NF"
      		    :height 160
@@ -426,15 +427,17 @@ n    ;; The minor mode bindings.
 ** Theme
 #+begin_src emacs-lisp
   (use-package alabaster-themes
-    :ensure t
-    :config)
-  ;; (load-theme 'alabaster-themes-dark t))
-  (use-package ef-themes
+    :ensure t)
+  (use-package autothemer
     :ensure t
     :config
-    (load-theme 'ef-dark t))
+    (load-theme 'onyx t))
 #+end_src
-
+** Transparency
+#+begin_src emacs-lisp
+  (add-to-list 'default-frame-alist '(alpha-background . 95))
+  (set-frame-parameter nil 'alpha-background 95)
+#+end_src
 * Diminish
 #+begin_src emacs-lisp
   (use-package diminish
