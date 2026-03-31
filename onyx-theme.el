@@ -35,6 +35,9 @@
   
   (mode-line           (:background onyx-grey :foreground onyx-fg))
   (mode-line-inactive  (:background onyx-bg :foreground onyx-grey))
+
+  (line-number (:foreground onyx-grey :background onyx-bg))
+  (line-number-current-line (:foreground onyx-blue :background onyx-bg :weight 'bold))
   
   (minibuffer-prompt (:foreground onyx-blue :weight 'bold))
   (completions-common-part (:foreground onyx-yellow :weight 'bold)) 
