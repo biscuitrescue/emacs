@@ -28,7 +28,7 @@
   (onyx-url     "#FFCAD4"))
 
  ((default (:foreground onyx-fg :background onyx-bg))
-  (cursor  (:background onyx-cursor))
+  (cursor  (:background onyx-yellow))
   (region  (:background onyx-sel-bg :foreground onyx-sel-fg))
   (highlight (:background onyx-sel-bg :foreground onyx-white))
   (link    (:foreground onyx-url :underline t))
@@ -83,6 +83,9 @@
   (org-todo (:foreground onyx-red :weight 'bold))
   (org-done (:foreground onyx-green-alt :weight 'bold))
   (org-block (:background "#050505" :extend t))
+
+  (show-paren-match (:foreground onyx-yellow :weight 'bold :underline t))
+  (show-paren-mismatch (:background onyx-red :foreground onyx-black :weight 'bold))
 
   (doom-modeline-bar (:background onyx-magenta))
   (doom-modeline-panel (:background onyx-sel-bg :foreground onyx-fg))
