@@ -27,22 +27,22 @@
   (onyx-cursor  "#da627d")
   (onyx-url     "#FFCAD4"))
 
- ((default (:foreground onyx-fg :background onyx-bg :font "Monaspace Krypton Frozen-14"))
-  (variable-pith (:font "Monaspace Krypton Var-16"))
-  (fixed-pith (:font "Monaspace Argon Frozen-16"))
+ ((default (:foreground onyx-fg :background onyx-bg :font "Monaspace Krypton Frozen-14.5"))
+  (variable-pith (:font "Monaspace Krypton Var-17"))
+  (fixed-pith (:font "Monaspace Argon Frozen-17"))
   (cursor  (:background onyx-yellow))
   (region  (:background onyx-sel-bg :foreground onyx-sel-fg))
   (highlight (:background onyx-sel-bg :foreground onyx-white))
   (link    (:foreground onyx-url :underline t))
-  
+
   (mode-line           (:background onyx-sel-bg :foreground onyx-fg))
   (mode-line-inactive  (:background onyx-bg :foreground onyx-grey))
 
   (line-number (:foreground onyx-grey :background onyx-bg))
   (line-number-current-line (:foreground onyx-blue :background onyx-bg :weight 'bold))
-  
+
   (minibuffer-prompt (:foreground onyx-blue :weight 'bold))
-  (completions-common-part (:foreground onyx-yellow :weight 'bold)) 
+  (completions-common-part (:foreground onyx-yellow :weight 'bold))
   (completions-first-match (:foreground onyx-yellow :weight 'bold))
   (match (:foreground onyx-yellow :weight 'bold))
   (orderless-match-face-0 (:foreground onyx-yellow :weight 'bold))
@@ -104,7 +104,7 @@
   (doom-modeline-project-dir (:foreground onyx-magenta :weight 'bold))
   (doom-modeline-project-parent (:foreground onyx-blue))
   (doom-modeline-project-root (:foreground onyx-magenta))
-  
+
   (doom-modeline-macro (:foreground onyx-magenta-alt)))
 
  (custom-theme-set-variables 'onyx
