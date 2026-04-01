@@ -33,7 +33,7 @@
   (highlight (:background onyx-sel-bg :foreground onyx-white))
   (link    (:foreground onyx-url :underline t))
   
-  (mode-line           (:background onyx-grey :foreground onyx-fg))
+  (mode-line           (:background onyx-sel-bg :foreground onyx-fg))
   (mode-line-inactive  (:background onyx-bg :foreground onyx-grey))
 
   (line-number (:foreground onyx-grey :background onyx-bg))
