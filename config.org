@@ -27,7 +27,7 @@
   - [[#theme][Theme]]
 - [[#fonts][Fonts]]
   - [[#font-face][Font face]]
-  - [[#transparency][Transparency]]
+- [[#transparency][Transparency]]
 - [[#diminish][Diminish]]
 - [[#org-mode][ORG Mode]]
   - [[#toc][TOC]]
@@ -411,9 +411,6 @@ n    ;; The minor mode bindings.
 #+end_src
 * Fonts
 ** Font face
-#+begin_src emacs-lisp
-  (defun my/set-font-faces ()
-    "Sets the custom fonts for Onyx theme."
     (set-face-attribute 'default nil
                         :font "Monaspace Krypton Frozen"
                         :height 140
@@ -426,56 +423,12 @@ n    ;; The minor mode bindings.
                         :font "Monaspace Argon NF"
                         :height 160
                         :weight 'medium)
-    ;; Re-apply italics if the theme stripped them
     (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
     (set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
 
-    (setq-default line-spacing 0.12))
+    (setq-default line-spacing 0.12)
 
-  ;; Run it once at startup
-  (add-hook 'after-init-hook #'my/set-font-faces)
-
-  ;; Run it again whenever a theme is enabled to prevent overrides
-  (add-hook 'enable-theme-functions (lambda (&rest _) (my/set-font-faces)))
-(defun my/apply-ui-customizations (&optional frame)
-  "Apply fonts and UI colors to the provided FRAME or selected frame."
-  (with-selected-frame (or frame (selected-frame))
-    (let ((bg (face-attribute 'default :background)))
-      ;; 1. Font Settings
-      (set-face-attribute 'default nil 
-                          :font "Monaspace Krypton Frozen" 
-                          :height 140 
-                          :weight 'regular)
-      (set-face-attribute 'variable-pitch nil 
-                          :font "Monaspace Krypton Var" 
-                          :height 160 
-                          :weight 'regular)
-      (set-face-attribute 'fixed-pitch nil 
-                          :font "Monaspace Argon NF" 
-                          :height 160 
-                          :weight 'medium)
-      
-      ;; 2. UI/Line Number Settings
-      (set-face-attribute 'line-number nil 
-                          :background bg 
-                          :foreground "#393D3F")
-      (set-face-attribute 'line-number-current-line nil 
-                          :background bg 
-                          :foreground "#7180ac")
-      (set-face-attribute 'fringe nil :background bg))))
-
-;; Standard Startup
-(add-hook 'after-init-hook #'my/apply-ui-customizations)
-
-;; Theme Switch Fix
-(add-hook 'enable-theme-functions #'my/apply-ui-customizations)
-
-;; MANDATORY FOR EMACSCLIENT:
-(add-hook 'after-make-frame-functions #'my/apply-ui-customizations)
-
-#+end_src
-
-** Transparency
+* Transparency
 #+begin_src emacs-lisp
   (add-to-list 'default-frame-alist '(alpha-background . 90))
   (set-frame-parameter nil 'alpha-background 90)
