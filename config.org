@@ -53,6 +53,7 @@
   - [[#comments][Comments]]
   - [[#eshell][Eshell]]
   - [[#ansi][ANSI]]
+  - [[#ibuffer][Ibuffer]]
   - [[#smooth-scroll][Smooth Scroll]]
 - [[#gcmh][GCMH]]
 
@@ -229,6 +230,7 @@ n    ;; The minor mode bindings.
      '("<escape>" . ignore))
     (meow-leader-define-key
      ;; Use SPC (0-9) for digit arguments.
+     '("SPC" . meow-M-x)
      '("1" . meow-digit-argument)
      '("2" . meow-digit-argument)
      '("3" . meow-digit-argument)
@@ -241,6 +243,8 @@ n    ;; The minor mode bindings.
      '("0" . meow-digit-argument)
      '("/" . meow-keypad-describe-key)
      '("." . find-file)
+     '("," . consult-buffer)
+     '("-" . project-dired)
      '("?" . meow-cheatsheet))
     (meow-normal-define-key
      '("0" . meow-expand-0)
@@ -412,7 +416,7 @@ n    ;; The minor mode bindings.
 * Fonts
 ** Font face
     (set-face-attribute 'default nil
-                        :font "Monaspace Krypton Frozen"
+                        :font "Monaspace Neon Frozen"
                         :height 140
                         :weight 'regular)
     (set-face-attribute 'variable-pitch nil
@@ -515,10 +519,13 @@ Table of Contents
   (use-package lsp-mode
     :ensure t
     :commands (lsp lsp-deferred)
+    :hook (lsp-mode . lsp-lens-mode)
     :init
     (setq lsp-keymap-prefix "C-c l")
     :config
     (lsp-enable-which-key-integration t)
+    (setq lsp-lens-enable t)
+    (lsp-ui-mode)
     (setq lsp-completion-provider :none))
 
   (add-hook 'c-mode-hook #'lsp-deferred)
@@ -1022,6 +1029,10 @@ Table of Contents
 (add-hook 'compilation-filter-hook 'my/ansi-colorize-compilation-buffer)
 #+end_src>
 
+** Ibuffer
+#+begin_src emacs-lisp 
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+#+end_src
 ** Smooth Scroll
 #+begin_src emacs-lisp
   (use-package ultra-scroll

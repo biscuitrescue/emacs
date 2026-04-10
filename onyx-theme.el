@@ -34,6 +34,7 @@
   (region  (:background onyx-sel-bg :foreground onyx-sel-fg))
   (highlight (:background onyx-sel-bg :foreground onyx-white))
   (link    (:foreground onyx-url :underline t))
+  (button  (:foreground onyx-green-alt :underline t :bold t))
 
   (mode-line           (:background onyx-sel-bg :foreground onyx-fg))
   (mode-line-inactive  (:background onyx-bg :foreground onyx-grey))
@@ -74,8 +75,8 @@
   (font-lock-constant-face          (:foreground onyx-cyan))
   (font-lock-function-name-face     (:foreground onyx-blue))
   (font-lock-keyword-face           (:foreground onyx-fg :weight 'bold))
-  (font-lock-string-face            (:foreground onyx-green))
-  (font-lock-type-face              (:foreground onyx-yellow))
+  (font-lock-string-face            (:foreground onyx-green-alt))
+  (font-lock-type-face              (:foreground onyx-green))
   (font-lock-variable-name-face      (:foreground onyx-yellow-alt))
   (font-lock-warning-face           (:foreground onyx-red :weight 'bold))
 
