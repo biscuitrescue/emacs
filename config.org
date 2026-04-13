@@ -91,7 +91,7 @@ Elpaca
                     ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
                                           "--eval" "(byte-recompile-directory \".\" 0 'force)")))
 
-((require 'elpaca))
+  				  ((require 'elpaca))
                     ((elpaca-generate-autoloads "elpaca" repo)))
               (progn (message "%s" (buffer-string)) (kill-buffer buffer))
             (error "%s" (with-current-buffer buffer (buffer-string))))
@@ -197,12 +197,12 @@ Elpaca
 
   (define-minor-mode resize-frame
     "A simple minor mode to resize-frame.
-  C-c C-c to apply."
+    C-c C-c to apply."
     ;; The initial value.
     :init-value nil
     ;; The indicator for the mode line.
     :lighter " ResizeFrame"
-n    ;; The minor mode bindings.
+    n    ;; The minor mode bindings.
     :keymap resize-frame-map
     :global t
     (if (<= (length (window-list)) 1)
@@ -392,11 +392,15 @@ n    ;; The minor mode bindings.
 #+end_src
 ** Basic conf
 #+begin_src emacs-lisp
-;;  (setq scroll-margin 4)
+  (setq scroll-margin 3)
   (indent-tabs-mode 1)
   (add-hook 'org-mode-hook (lambda () (setq tab-width 8)))
-  ;;(setq scroll-step 1 scroll-conservatively 10000)
-  ;;  (setq-default mode-line-format " %* %b %l:%C %*")
+  (setq-default tab-width 4)
+  (setq-default standard-indent 4)
+  (setq case-fold-search t)
+  (setq search-upper-case t)
+  (setq isearch-lazy-highlight t)
+  (setq-default highlight-nonselected-windows nil)
 #+end_src
 ** Line Numbers
 #+begin_src emacs-lisp
@@ -415,27 +419,30 @@ n    ;; The minor mode bindings.
 #+end_src
 * Fonts
 ** Font face
-    (set-face-attribute 'default nil
-                        :font "Monaspace Neon Frozen"
-                        :height 140
-                        :weight 'regular)
-    (set-face-attribute 'variable-pitch nil
-                        :font "Monaspace Krypton Var"
-                        :height 160
-                        :weight 'regular)
-    (set-face-attribute 'fixed-pitch nil
-                        :font "Monaspace Argon NF"
-                        :height 160
-                        :weight 'medium)
-    (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
-    (set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
+#+begin_src emacs-lisp
 
-    (setq-default line-spacing 0.12)
+  (set-face-attribute 'default nil
+  					:font "Monaspace Neon Frozen"
+  					:height 145
+  					:weight 'regular)
+  (set-face-attribute 'variable-pitch nil
+  					:font "Monaspace Neon Var"
+  					:height 160
+  					:weight 'regular)
+  (set-face-attribute 'fixed-pitch nil
+  					:font "Monaspace Argon NF"
+  					:height 160
+  					:weight 'medium)
+  (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
+  (set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
+
+  (setq-default line-spacing 0.12)
+#+end_src
 
 * Transparency
 #+begin_src emacs-lisp
-  (add-to-list 'default-frame-alist '(alpha-background . 90))
-  (set-frame-parameter nil 'alpha-background 90)
+  (add-to-list 'default-frame-alist '(alpha-background . 100))
+  (set-frame-parameter nil 'alpha-background 100)
 #+end_src
 * Diminish
 #+begin_src emacs-lisp
@@ -524,6 +531,7 @@ Table of Contents
     (setq lsp-keymap-prefix "C-c l")
     :config
     (lsp-enable-which-key-integration t)
+    (setq lsp-inlay-hint-enable t)
     (setq lsp-lens-enable t)
     (lsp-ui-mode)
     (setq lsp-completion-provider :none))
@@ -552,10 +560,15 @@ Table of Contents
     :ensure (:wait t)
     :mode "\\.rs\\'"
     :config
+    (setq lsp-rust-analyzer-display-parameter-hints t)
+    (setq lsp-rust-analyzer-display-chaining-hints t)
+    (setq lsp-rust-analyzer-display-closure-return-type-hints t)
+
     (setq rust-format-on-save t))
   (with-eval-after-load 'flycheck
     (setq-default flycheck-disabled-checkers '(rust-cargo))
     (setq-default flycheck-checker 'lsp))
+
   (use-package zig-mode
     :ensure t
     :mode "\\.zig\\'"
@@ -580,6 +593,23 @@ Table of Contents
       :new-connection (lsp-stdio-connection "nil_ls")
       :major-modes '(nix-mode)
       :server-id 'nil-ls)))
+
+  (use-package go-mode
+    :ensure t
+    :mode "\\.go\\'"
+    :hook (go-mode . lsp-deferred)
+    :config
+    ;; Optional: Run gofmt/goimports before saving
+    (add-hook 'before-save-hook #'lsp-format-buffer t t)
+    (add-hook 'before-save-hook #'lsp-organize-imports t t))
+  (use-package python-mode
+    :ensure t
+    :hook (python-base-mode . lsp-deferred)
+    :config
+    ;; Optional: specify which language server to use if multiple are installed
+    (setq lsp-pyright-multi-root nil)) ; basic setup
+
+
 #+end_src
 
 *** Corfu
@@ -907,7 +937,7 @@ Table of Contents
                   term-mode-hook
                   vterm-mode-hook
                   shell-mode-hook
-  		dired-mode-hook
+  				dired-mode-hook
                   treemacs-mode-hook
                   eshell-mode-hook))
     (add-hook mode (lambda() (display-line-numbers-mode -1))))
@@ -954,7 +984,7 @@ Table of Contents
 #+begin_src emacs-lisp
   (defun efs/org-babel-tangle-config ()
     (when (string-equal (buffer-file-name)
-  		      (expand-file-name "~/.emacs.d/config.org"))
+  					  (expand-file-name "~/.emacs.d/config.org"))
       (let ((org-confirm-babel-evaluate nil))
         (org-babel-tangle))))
   (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
@@ -1040,7 +1070,7 @@ Table of Contents
     :vc (:url "https://github.com/jdtsmith/ultra-scroll")
     :init
     (setq scroll-conservatively 3
-  	scroll-margin 0)      
+  		scroll-margin 0)      
     :config
     (ultra-scroll-mode 1))
 #+end_src
