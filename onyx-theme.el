@@ -20,13 +20,14 @@
   (onyx-magenta-alt "#9B5094")
   (onyx-cyan    "#99EDCC")
   (onyx-cyan-alt "#75BBA7")
-  (onyx-white   "#D5C5C8")
+  (onyx-white   "#ffffff")
   (onyx-white-alt "#F7F0F5")
   (onyx-sel-bg  "#293334")
   (onyx-sel-fg  "#cecece")
   (onyx-cursor  "#da627d")
   (onyx-orange "#F49D6E")
   (onyx-hint "#837A75")
+  (onyx-graphite "#1a1a1a")
   (onyx-url     "#FFCAD4"))
 
  ((default (:foreground onyx-fg :background onyx-bg))
@@ -44,9 +45,9 @@
 
   (line-number (:foreground onyx-grey :background onyx-bg))
   (line-number-current-line (:foreground onyx-blue :background onyx-bg :weight 'bold))
-
-  (corfu-default   (:background onyx-sel-bg :foreground onyx-fg))
-  (corfu-current   (:background onyx-grey :foreground onyx-white :weight 'bold))
+  
+  (corfu-default   (:background onyx-bg :foreground onyx-fg))
+  (corfu-current   (:background onyx-sel-bg :foreground onyx-url :weight 'bold))
   (corfu-bar       (:background onyx-blue))
   (corfu-border    (:background onyx-sel-bg))
   (corfu-annotations (:foreground onyx-hint :italic t))
@@ -114,7 +115,12 @@
   (org-link (:foreground onyx-url :underline t))
   (org-todo (:foreground onyx-red :weight 'bold))
   (org-done (:foreground onyx-green-alt :weight 'bold))
-  (org-block (:background "#050505" :extend t))
+  (org-code (:foreground onyx-green :weight 'bold))
+  (org-verbatim (:foreground onyx-green-alt :weight 'bold))
+  (org-block (:background onyx-bg :extend t))
+  (org-block-begin-line (:background onyx-graphite :foreground onyx-yellow-alt :extend t :weight 'bold :height 0.9))
+  (org-block-end-line (:background onyx-graphite :foreground onyx-yellow-alt :extend t :weight 'bold :height 0.9))
+  (org-quote (:background onyx-graphite :extend t))
 
   (show-paren-match (:foreground onyx-yellow :weight 'bold :underline t))
   (show-paren-mismatch (:background onyx-red :foreground onyx-black :weight 'bold))
