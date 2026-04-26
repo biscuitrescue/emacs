@@ -27,6 +27,7 @@
   (onyx-cursor  "#da627d")
   (onyx-orange "#F49D6E")
   (onyx-hint "#837A75")
+  (onyx-graphite "#1a1a1a")
   (onyx-url     "#FFCAD4"))
 
  ((default (:foreground onyx-fg :background onyx-bg))
@@ -115,6 +116,11 @@
   (org-todo (:foreground onyx-red :weight 'bold))
   (org-done (:foreground onyx-green-alt :weight 'bold))
   (org-block (:background "#050505" :extend t))
+  (org-verbatim (:foreground onyx-green-alt :weight 'bold))
+  (org-block (:background onyx-bg :extend t))
+  (org-block-begin-line (:background onyx-graphite :foreground onyx-yellow-alt :extend t :weight 'bold :height 0.9))
+  (org-block-end-line (:background onyx-graphite :foreground onyx-yellow-alt :extend t :weight 'bold :height 0.9))
+  (org-quote (:background onyx-graphite :extend t))
 
   (show-paren-match (:foreground onyx-yellow :weight 'bold :underline t))
   (show-paren-mismatch (:background onyx-red :foreground onyx-black :weight 'bold))
