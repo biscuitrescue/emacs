@@ -45,7 +45,7 @@
 
   (line-number (:foreground onyx-grey :background onyx-bg))
   (line-number-current-line (:foreground onyx-blue :background onyx-bg :weight 'bold))
-  
+
   (corfu-default   (:background onyx-bg :foreground onyx-fg))
   (corfu-current   (:background onyx-sel-bg :foreground onyx-url :weight 'bold))
   (corfu-bar       (:background onyx-blue))
@@ -115,7 +115,6 @@
   (org-link (:foreground onyx-url :underline t))
   (org-todo (:foreground onyx-red :weight 'bold))
   (org-done (:foreground onyx-green-alt :weight 'bold))
-  (org-code (:foreground onyx-green :weight 'bold))
   (org-verbatim (:foreground onyx-green-alt :weight 'bold))
   (org-block (:background onyx-bg :extend t))
   (org-block-begin-line (:background onyx-graphite :foreground onyx-yellow-alt :extend t :weight 'bold :height 0.9))
