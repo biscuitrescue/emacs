@@ -117,7 +117,7 @@
   (org-done (:foreground onyx-green-alt :weight 'bold))
   (org-verbatim (:foreground onyx-green-alt :weight 'bold :background onyx-graphite))
   (org-code (:foreground onyx-yellow :weight 'bold :background onyx-graphite))
-  (org-block (:background onyx-bg :extend t))
+  (org-block (:background onyx-graphite :extend t))
   (org-block-begin-line (:background onyx-graphite :foreground onyx-yellow-alt :extend t :weight 'bold :height 0.9))
   (org-block-end-line (:background onyx-graphite :foreground onyx-yellow-alt :extend t :weight 'bold :height 0.9))
   (org-quote (:background onyx-graphite :extend t))

@@ -229,11 +229,12 @@ Elpaca
      '("<escape>" . ignore))
     (meow-leader-define-key
      ;; Use SPC (0-9) for digit arguments.
-     '("j h" . windmove-left)
-     '("j l" . windmove-right)
-     '("j j" . windmove-down)
-     '("j k" . windmove-up)
+     '("d h" . windmove-left)
+     '("d l" . windmove-right)
+     '("d j" . windmove-down)
+     '("d k" . windmove-up)
      '("w r" . resize-frame)
+     '("w q" . kill-buffer-and-window)
      '("SPC" . meow-M-x)
      '("1" . meow-digit-argument)
      '("2" . meow-digit-argument)
@@ -488,8 +489,8 @@ Elpaca
 
 * Transparency
 #+begin_src emacs-lisp
-  (add-to-list 'default-frame-alist '(alpha-background . 100))
-  (set-frame-parameter nil 'alpha-background 100)
+  (add-to-list 'default-frame-alist '(alpha-background . 95))
+  (set-frame-parameter nil 'alpha-background 95)
 #+end_src
 * Diminish
 #+begin_src emacs-lisp
@@ -512,23 +513,28 @@ Table of Contents
 
 ** Org Bullets
 #+begin_src emacs-lisp
-  (add-hook 'org-mode-hook 'org-indent-mode)
-  (add-hook 'org-mode-hook #'org-modern-mode)
-  (use-package org-modern
-    :ensure t)
-  (setq
-   ;; Edit settings
-   org-auto-align-tags nil
-   org-tags-column 0
-   org-catch-invisible-edits 'show-and-error
-   org-special-ctrl-a/e t
-   org-insert-heading-respect-content t
+  (use-package org
+    :ensure t
+    :hook (org-mode . org-indent-mode))
 
-   ;; Org styling, hide markup etc.
-   org-hide-emphasis-markers t
-   org-pretty-entities t
-   org-agenda-tags-column 0
-   org-ellipsis "…")
+
+  (use-package org-modern
+    :ensure t
+    :hook (org-mode . org-modern-mode)
+    :config
+    (setq
+     ;; Edit settings
+     org-auto-align-tags nil
+     org-tags-column 0
+     org-catch-invisible-edits 'show-and-error
+     org-special-ctrl-a/e t
+     org-insert-heading-respect-content t
+
+     ;; Org styling, hide markup etc.
+     org-hide-emphasis-markers t
+     org-pretty-entities t
+     org-agenda-tags-column 0
+     org-ellipsis "…"))
 #+end_src
 ** Org Roam
 #+begin_src emacs-lisp
@@ -549,6 +555,8 @@ Table of Contents
     (org-roam-db-autosync-mode)
     ;; If using org-roam-protocol
     (require 'org-roam-protocol))
+  (setq org-src-preserve-indentation t)
+  (setq org-edit-src-content-indentation 0)
   #+end_src
 
 ** Electric Indent
