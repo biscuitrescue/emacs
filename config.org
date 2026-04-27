@@ -46,7 +46,6 @@
   - [[#vterm-toggle][Vterm Toggle]]
 - [[#magit][Magit]]
 - [[#utils][Utils]]
-  - [[#mu4e][Mu4e]]
   - [[#pdf][PDF]]
   - [[#consult-line][consult line]]
   - [[#tab-bar-mode][Tab Bar Mode]]
@@ -437,12 +436,12 @@ Elpaca
     :config
     ;; All customisations here.
     (setq modus-themes-mixed-fonts t)
-    (setq modus-themes-italic-constructs t)
+    (setq modus-themes-italic-constructs t))
 
     ;; Finally, load your theme of choice (or a random one with
     ;; `modus-themes-load-random', `modus-themes-load-random-dark',
     ;; `modus-themes-load-random-light').
-    (modus-themes-load-theme 'ef-summer))
+  ;;   (modus-themes-load-theme 'ef-summer))
   (use-package autothemer
     :ensure t
     :config
@@ -1016,37 +1015,6 @@ Table of Contents
 #+end_src
 
 * Utils
-** Mu4e
-#+begin_src emacs-lisp
-  (setq auth-sources '("~/.authinfo.gpg"))
-  (use-package mu4e
-    :ensure t
-    :config
-    (setq mail-user-agent 'mu4e)
-    (user-mail-address "karttikeyasinha11@gmail.com")
-    (user-full-name "Karttikeya Sinha")
-    (setq mu4e-get-mail-command "mbsync -a"
-        	mu4e-update-interval 180)
-    (setq mu4e-use-fancy-chars t)
-    :hook
-    ;; tweak the composer
-    ((mu4e-compose-mode . (lambda ()
-                            (set-fill-column 72)
-                            (flyspell-mode)))
-     ;; allow for inserting attachments with dired,
-     ;;   with `M-x gnus-dired-attach'
-     (dired-mode  . turn-on-gnus-dired-mode))
-
-    :bind ;; the Mu4e transient menu
-    (("C-c m" . mu4e-transient-menu)))
-
-  (require 'smtpmail)
-  (setq message-send-mail-function 'smtpmail-send-it
-        smtpmail-stream-type 'ssl
-        smtpmail-default-smtp-server "smtp.gmail.com"
-        smtpmail-smtp-server "smtp.gmail.com"
-        smtpmail-smtp-service 465)
-#+end_src
 ** PDF
 #+begin_src emacs-lisp
   (use-package pdf-tools
