@@ -76,6 +76,10 @@
   (ivy-minibuffer-match-face-3 (:foreground onyx-yellow :weight 'bold))
   (ivy-minibuffer-match-face-4 (:foreground onyx-yellow :weight 'bold))
 
+  (diff-hl-insert (:foreground onyx-green-alt :background onyx-green-alt))
+  (diff-hl-change (:foreground onyx-orange :background onyx-orange))
+  (diff-hl-delete (:foreground onyx-red-alt :background onyx-yellow-alt))
+
   (magit-section-heading        (:foreground onyx-yellow :weight 'bold))
   (magit-diff-added             (:foreground onyx-green :background "#0f1a0f"))
   (magit-diff-added-highlight   (:foreground onyx-green :background "#1a2a1a"))
@@ -118,13 +122,15 @@
   (org-verbatim (:foreground onyx-green-alt :weight 'bold :background onyx-graphite))
   (org-code (:foreground onyx-yellow :weight 'bold :background onyx-graphite))
   (org-block (:background onyx-graphite :extend t))
-  (org-block-begin-line (:background onyx-graphite :foreground onyx-yellow-alt :extend t :weight 'bold :height 0.9))
-  (org-block-end-line (:background onyx-graphite :foreground onyx-yellow-alt :extend t :weight 'bold :height 0.9))
+  (org-block-begin-line (:background onyx-graphite :foreground onyx-red-alt :extend t :weight 'bold :height 0.9))
+  (org-block-end-line (:background onyx-graphite :foreground onyx-red-alt :extend t :weight 'bold :height 0.9))
   (org-quote (:background onyx-graphite :extend t))
 
   (show-paren-match (:foreground onyx-yellow :weight 'bold :underline t))
   (show-paren-mismatch (:background onyx-red :foreground onyx-black :weight 'bold))
 
+  (mode-line (:background onyx-sel-bg :foreground onyx-fg))
+  (mode-line-inactive (:background onyx-bg :foreground onyx-sel-bg))
   (doom-modeline-bar (:background onyx-magenta))
   (doom-modeline-panel (:background onyx-sel-bg :foreground onyx-fg))
   (doom-modeline-buffer-file (:foreground onyx-fg))
@@ -143,5 +149,16 @@
  (custom-theme-set-variables 'onyx
   `(ansi-color-names-vector [,onyx-black ,onyx-red ,onyx-green ,onyx-yellow ,onyx-blue ,onyx-magenta ,onyx-cyan ,onyx-white])
   `(pdf-view-midnight-colors '(,onyx-fg . ,onyx-bg))))
+
+(when (not (display-graphic-p))
+  (setq terminal-frame-background-mode 'dark)
+
+  (custom-theme-set-faces
+   'onyx
+   `(default ((t (:foreground "#bdc4a7" :background "#0c0c0c"))))
+   `(cursor ((t (:background "#F9DF74"))))
+   `(region ((t (:background "#293334"))))
+   `(mode-line ((t (:foreground "#bdc4a7" :background "#293334"))))
+   `(mode-line-inactive ((t (:foreground "#393D3F" :background "#0c0c0c"))))))
 
 (provide-theme 'onyx)

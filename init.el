@@ -35,7 +35,12 @@
 	 "fa63a24332bf5d6ae4410fadaa9a176ab7c3297ea36e3fd637314aa25dcfb74e"
 	 default))
  '(highlight-indent-guides-method 'character)
- '(package-selected-packages nil))
+ '(package-selected-packages nil)
+ '(writeroom-border-width 10)
+ '(writeroom-bottom-divider-width 0)
+ '(writeroom-fullscreen-effect 'maximized)
+ '(writeroom-mode-line t)
+ '(writeroom-width 0.5))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
