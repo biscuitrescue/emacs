@@ -58,6 +58,7 @@
   - [[#ansi][ANSI]]
   - [[#ibuffer][Ibuffer]]
   - [[#smooth-scroll][Smooth Scroll]]
+  - [[#dired][Dired]]
 - [[#gcmh][GCMH]]
 
 * Init Loading programs
@@ -1299,7 +1300,10 @@ Table of Contents
     :config
     (ultra-scroll-mode 1))
 #+end_src
-
+** Dired
+#+begin_src emacs-lisp
+(setq dired-kill-when-opening-new-dired-buffer t)
+#+end_src
 * GCMH
 #+begin_src emacs-lisp
 (use-package gcmh
