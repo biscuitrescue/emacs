@@ -561,15 +561,15 @@ Elpaca
   (with-selected-frame (or frame (selected-frame))
     (set-face-attribute 'default nil
                         :font "Monaspace Krypton Frozen"
-                        :height 145
+                        :height 135
                         :weight 'regular)
     (set-face-attribute 'variable-pitch nil
                         :font "Monaspace Neon Var"
-                        :height 160
+                        :height 150
                         :weight 'regular)
     (set-face-attribute 'fixed-pitch nil
                         :font "JetbrainsMono nerd font"
-                        :height 160
+                        :height 150
                         :weight 'medium)
     (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
     (set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
