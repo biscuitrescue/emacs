@@ -91,10 +91,10 @@
   (font-lock-comment-face           (:foreground onyx-orange))
   (font-lock-function-call-face     (:foreground onyx-blue))
   (font-lock-constant-face          (:foreground onyx-cyan))
-  (font-lock-function-name-face     (:foreground onyx-blue))
+  (font-lock-function-name-face     (:foreground onyx-yellow))
   (font-lock-keyword-face           (:foreground onyx-fg :weight 'bold))
   (font-lock-string-face            (:foreground onyx-green-alt))
-  (font-lock-type-face              (:foreground onyx-yellow))
+  (font-lock-type-face              (:foreground onyx-fg :italic t))
   (font-lock-variable-name-face      (:foreground onyx-yellow-alt))
   (font-lock-warning-face           (:foreground onyx-red :weight 'bold))
 
