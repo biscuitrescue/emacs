@@ -461,6 +461,7 @@ Elpaca
    mode-line-end-spaces))
 
 (setq-default mode-line-format-right-align t)
+
 #+end_src
 
 #+begin_src emacs-lisp
@@ -582,8 +583,8 @@ Elpaca
 
 * Transparency
 #+begin_src emacs-lisp
-(add-to-list 'default-frame-alist '(alpha-background . 95))
-(set-frame-parameter nil 'alpha-background 95)
+(add-to-list 'default-frame-alist '(alpha-background . 100))
+(set-frame-parameter nil 'alpha-background 100)
 #+end_src
 * Diminish
 #+begin_src emacs-lisp
@@ -608,6 +609,8 @@ Table of Contents
   :hook ((org-mode . org-indent-mode)
 		 (org-mode . (lambda () (setq tab-width 8))))
 
+  :bind (:map org-mode-map
+              ("RET" . org-return-and-maybe-indent))
   :config
   (setq org-src-tab-acts-natively t
 		org-src-preserve-indentation t
@@ -632,6 +635,15 @@ Table of Contents
    org-pretty-entities t
    org-agenda-tags-column 0
    org-ellipsis "…"))
+
+(defun my/org-meta-return-at-end-of-line ()
+  "Move to the end of the line and call `org-meta-return`."
+  (interactive)
+  (move-end-of-line 1)
+  (org-meta-return))
+
+(with-eval-after-load 'org
+  (define-key org-mode-map (kbd "M-RET") #'my/org-meta-return-at-end-of-line))
 #+end_src
 ** Org Roam
 #+begin_src emacs-lisp
@@ -654,6 +666,24 @@ Table of Contents
   (require 'org-roam-protocol))
 (setq org-src-preserve-indentation t)
 (setq org-edit-src-content-indentation 0)
+(use-package org-roam-ui
+  :ensure t
+  :after org-roam
+  :config
+  (setq org-roam-ui-sync-theme t
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t))
+
+(add-hook 'org-mode-hook #'variable-pitch-mode)
+
+(use-package mixed-pitch
+  :ensure t
+  :hook (org-mode . mixed-pitch-mode))
+
+(use-package consult-org-roam
+  :ensure t
+  :after org-roam
+  :config (consult-org-roam-mode 1))
   #+end_src
 
 ** Electric Indent
@@ -1000,7 +1030,7 @@ Table of Contents
 (use-package vertico
   :ensure t
   :custom
-  (vertico-scroll-margin 0) ;; Different scroll margin
+  (vertico-scroll-margin 3) ;; Different scroll margin
   (vertico-count 20) ;; Show more candidates
   (vertico-resize t) ;; Grow and shrink the Vertico minibuffer
   (vertico-cycle t) ;; Enable cycling for `vertico-next/previous'
@@ -1297,13 +1327,16 @@ Table of Contents
     :vc (:url "https://github.com/jdtsmith/ultra-scroll")
     :init
     (setq scroll-conservatively 3
-  		scroll-margin 0)      
+  		scroll-margin 3)      
     :config
     (ultra-scroll-mode 1))
 #+end_src
 ** Dired
 #+begin_src emacs-lisp
 (setq dired-kill-when-opening-new-dired-buffer t)
+(setq dired-omit-files "^\\..*$")
+
+(global-set-key (kbd "C-c o") 'dired-omit-mode)
 #+end_src
 ** POPUP
 #+begin_src emacs-lisp

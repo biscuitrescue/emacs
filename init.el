@@ -40,7 +40,7 @@
  '(writeroom-bottom-divider-width 0)
  '(writeroom-fullscreen-effect 'maximized)
  '(writeroom-mode-line t)
- '(writeroom-width 0.5))
+ '(writeroom-width 0.65))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
