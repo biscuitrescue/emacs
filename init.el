@@ -8,7 +8,8 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("be5afb81cae07b4f5520353568ce20d26756f963129486e9b24cf72080faee13"
+   '("5dbc73186271398ac009e6f48bf9366961584dcaf92df483e250b1cf9cfb6a49"
+	 "be5afb81cae07b4f5520353568ce20d26756f963129486e9b24cf72080faee13"
 	 "d537fda6faf6a921af3e2d249dcd25ace440cd7b89b2091ae34bb80a61b86e34"
 	 "01f6946488b7d6f6857e58b2372527b7bd1b63910f38123e72cf00e4c9651895"
 	 "6501b4451d7ac2fcf659600935c488f39ed0b2aad681bf039f6713f9454d9268"
