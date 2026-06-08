@@ -18,8 +18,8 @@
 - [[#ui][UI]]
   - [[#rainbow-mode][Rainbow Mode]]
   - [[#zooming-inout][Zooming In/Out]]
-  - [[#theme][Theme]]
   - [[#modeline][Modeline]]
+  - [[#theme][Theme]]
   - [[#dashboard][Dashboard]]
   - [[#disable-menubar-toolbar-scrollbar][Disable menubar, toolbar, scrollbar]]
   - [[#popup-menu][Popup menu]]
@@ -47,6 +47,7 @@
 - [[#magit][Magit]]
 - [[#utils][Utils]]
   - [[#writeroom-mode][Writeroom mode]]
+  - [[#exec-path-from-shell-nixos][exec path from shell (nixos)]]
   - [[#coding-utils][Coding Utils]]
   - [[#pdf][PDF]]
   - [[#consult-line][consult line]]
@@ -342,40 +343,18 @@ Elpaca
 (global-set-key (kbd "C--") 'text-scale-decrease)
 
 #+end_src
-** Theme
-#+begin_src emacs-lisp
-(use-package ef-themes
-  :ensure t
-  :init
-  (ef-themes-take-over-modus-themes-mode 1)
-  :bind
-  (("<f5>" . modus-themes-rotate)
-   ("C-<f5>" . modus-themes-select)
-   ("M-<f5>" . modus-themes-load-random))
-  :config
-  (setq modus-themes-mixed-fonts t)
-  (setq modus-themes-italic-constructs t))
-
-(use-package autothemer
-  :ensure t
-  :config
-  (load-theme 'onyx t))
-#+end_src
 ** Modeline
-
 #+begin_src emacs-lisp
 (defun my-sync-modeline-box-colors ()
   (set-face-attribute
    'mode-line nil
-   :box `(:line-width 3
+   :box `(:line-width 4
           :color ,(face-background 'mode-line nil t)))
 
   (set-face-attribute
    'mode-line-inactive nil
-   :box `(:line-width 3
+   :box `(:line-width 4
           :color ,(face-background 'mode-line-inactive nil t))))
-
-(add-hook 'after-load-theme-hook #'my-sync-modeline-box-colors)
 
 (column-number-mode 1)
 (size-indication-mode 1)
@@ -486,6 +465,25 @@ Elpaca
 ;;   (setq doom-modeline-buffer-file-name-style 'file-name))
 
 #+end_src
+** Theme
+#+begin_src emacs-lisp
+(use-package ef-themes
+  :ensure t
+  :init
+  (ef-themes-take-over-modus-themes-mode 1)
+  :bind
+  (("<f5>" . modus-themes-rotate)
+   ("C-<f5>" . modus-themes-select)
+   ("M-<f5>" . modus-themes-load-random))
+  :config
+  (setq modus-themes-mixed-fonts t)
+  (setq modus-themes-italic-constructs t))
+
+(use-package autothemer
+  :ensure t
+  :config
+  (load-theme 'onyx t))
+#+end_src
 ** Dashboard
 #+begin_src emacs-lisp
 (use-package dashboard
@@ -574,29 +572,45 @@ Elpaca
   (with-selected-frame (or frame (selected-frame))
     (set-face-attribute 'default nil
                         :font "Monaspace Krypton Frozen"
-                        :height 145
+                        :height 100
                         :weight 'regular)
     (set-face-attribute 'variable-pitch nil
                         :font "Monaspace Neon Var"
-                        :height 160
+                        :height 115
                         :weight 'regular)
     (set-face-attribute 'fixed-pitch nil
                         :font "Monaspace Krypton Frozen"
-                        :height 160
+                        :height 115
                         :weight 'medium)
     (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
     (set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
-    (setq-default line-spacing 0.12)))
+    (setq-default line-spacing 0.12)
+	(my-sync-modeline-box-colors)))
+
+(defun my/match-bg-faces (&rest _)
+  (let ((bg (face-background 'mode-line nil t))
+        (bg-inactive (face-background 'mode-line-inactive nil t)))
+    ;; Defensive check to avoid setting a nil color box
+    (when (stringp bg)
+      (set-face-attribute 'mode-line nil :box `(:line-width 4 :color ,bg)))
+    (when (stringp bg-inactive)
+      (set-face-attribute 'mode-line-inactive nil :box `(:line-width 4 :color ,bg-inactive)))
+    (set-face-attribute 'line-number nil :background (face-attribute 'default :background))
+    (set-face-attribute 'line-number-current-line nil :background (face-attribute 'default :background))
+    (set-face-attribute 'fringe nil :background (face-attribute 'default :background))))
 
 (if (daemonp)
     (add-hook 'after-make-frame-functions #'my/apply-fonts)
   (my/apply-fonts))
+
+(add-hook 'window-setup-hook #'my/match-bg-faces) ; Wait until frame graphics are completely ready
+(add-hook 'enable-theme-functions #'my/match-bg-faces)
 #+end_src
 
 * Transparency
 #+begin_src emacs-lisp
-(add-to-list 'default-frame-alist '(alpha-background . 100))
-(set-frame-parameter nil 'alpha-background 100)
+(add-to-list 'default-frame-alist '(alpha-background . 95))
+(set-frame-parameter nil 'alpha-background 95)
 #+end_src
 * Diminish
 #+begin_src emacs-lisp
@@ -1214,6 +1228,11 @@ Table of Contents
 (use-package writeroom-mode
 :ensure t)
 (global-set-key (kbd "C-M-z") 'writeroom-mode)
+#+end_src
+** exec path from shell (nixos)
+#+begin_src emacs-lisp
+(setq shell-file-name "/bin/sh")
+(setenv "SHELL" "/bin/sh")
 #+end_src
 ** Coding Utils
 *** Embark
