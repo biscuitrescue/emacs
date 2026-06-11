@@ -242,7 +242,7 @@ Elpaca
    '("d k" . windmove-up)
    '("w r" . resize-frame)
    '("w q" . kill-buffer-and-window)
-   '("SPC" . meow-M-x)
+   '("SPC" . project-find-file)
    '("1" . meow-digit-argument)
    '("2" . meow-digit-argument)
    '("3" . meow-digit-argument)
@@ -572,7 +572,7 @@ Elpaca
   (with-selected-frame (or frame (selected-frame))
     (set-face-attribute 'default nil
                         :font "Monaspace Krypton Frozen"
-                        :height 100
+                        :height 105
                         :weight 'regular)
     (set-face-attribute 'variable-pitch nil
                         :font "Monaspace Neon Var"
@@ -609,8 +609,8 @@ Elpaca
 
 * Transparency
 #+begin_src emacs-lisp
-(add-to-list 'default-frame-alist '(alpha-background . 95))
-(set-frame-parameter nil 'alpha-background 95)
+(add-to-list 'default-frame-alist '(alpha-background . 90))
+(set-frame-parameter nil 'alpha-background 90)
 #+end_src
 * Diminish
 #+begin_src emacs-lisp
@@ -1175,7 +1175,7 @@ Table of Contents
   (add-hook 'vterm-mode-hook #'my/set-term-colors)
   (advice-add 'load-theme :after
               (lambda (&rest _) (my/set-term-colors))))
-(setq shell-file-name "/bin/fish")
+(setq shell-file-name "/bin/zsh")
 #+end_src
 ** Vterm Toggle
 #+begin_src emacs-lisp
@@ -1233,6 +1233,7 @@ Table of Contents
 #+begin_src emacs-lisp
 (setq shell-file-name "/bin/sh")
 (setenv "SHELL" "/bin/sh")
+(setq vterm-shell "/run/current-system/sw/bin/zsh")
 #+end_src
 ** Coding Utils
 *** Embark
